@@ -18,6 +18,8 @@ import { AudioManager } from './core/AudioManager.js';
 import { HapticManager } from './core/HapticManager.js';
 import { Shop } from './ui/Shop.js';
 import { SkinConfig } from './core/SkinConfig.js';
+import { DailyTaskUI } from './ui/DailyTaskUI.js';
+import { SettingsUI } from './ui/SettingsUI.js';
 
 class Game {
   constructor() {
@@ -41,10 +43,14 @@ class Game {
     this.menu = new Menu(
       () => this.startGame(),
       (theme) => this.changeTheme(theme),
-      () => this.showShop()
+      () => this.showShop(),
+      () => this.showTasks(),
+      () => this.showSettings()
     );
     this.hud = new HUD();
     this.shop = new Shop(this.storage, (skinId) => this.applySkin(skinId));
+    this.taskUI = new DailyTaskUI(this.storage, this.dailyTasks);
+    this.settingsUI = new SettingsUI(this.storage, (key, val) => this.applySetting(key, val));
     this.gameOverScreen = new GameOver(() => this.restartGame(), () => this.showMenu());
 
     this.sceneManager.setCamera(this.cameraManager.camera);
@@ -65,8 +71,9 @@ class Game {
     }
     this.themeManager.reset(); // Apply initial biome
 
-    // Apply initial skin
+    // Apply initial skin and settings
     this.applySkin(this.storage.data.selectedSkin);
+    this.player.useTilt = this.storage.data.settings.tiltEnabled;
 
     this.hud.create();
     this.hud.setPauseCallbacks(
@@ -103,25 +110,70 @@ class Game {
     this.shop.show();
   }
 
+  showTasks() {
+    this.taskUI.show();
+  }
+
+  showSettings() {
+    this.settingsUI.show();
+  }
+
+  applySetting(key, val) {
+    console.log(`Setting changed: ${key} = ${val}`);
+    if (key === 'tiltEnabled') {
+      this.player.useTilt = val;
+    } else if (key === 'musicEnabled') {
+      if (val) this.audio.resume(); else this.audio.pause();
+    }
+    // Haptics and Sound FX are checked inside Manager classes usually
+  }
+
   applySkin(skinId) {
     const skinData = SkinConfig.skins[skinId];
     this.player.setSkin(skinData);
   }
 
   startGame() {
+    this.gameState.state = 'COUNTDOWN';
     this.gameState.reset();
     this.player.reset();
 
-    // Apply selected skin from storage
+    // Apply selected skin and settings
     this.applySkin(this.storage.data.selectedSkin);
+    this.player.useTilt = this.storage.data.settings.tiltEnabled;
 
     this.obstacleFactory.reset();
     this.bonusSystem.reset();
     this.themeManager.reset();
     this.hud.show();
     this.audio.resume(); // Resume audio context for iOS
-    this.storage.incrementStat('totalGamesPlayed');
-    console.log("Game started!");
+
+    this.startCountdown();
+  }
+
+  startCountdown() {
+    this.countdownOverlay.style.display = 'flex';
+    let count = 3;
+
+    const updateCount = () => {
+      if (count > 0) {
+        this.countdownText.textContent = count;
+        this.audio.playCoin(); // Use a beep sound placeholder
+        count--;
+        setTimeout(updateCount, 1000);
+      } else {
+        this.countdownText.textContent = 'GO!';
+        this.audio.playPerfect(); // Preparing for takeoff
+        setTimeout(() => {
+          this.countdownOverlay.style.display = 'none';
+          this.gameState.state = 'PLAYING';
+          this.storage.incrementStat('totalGamesPlayed');
+          console.log("Game started!");
+        }, 500);
+      }
+    };
+
+    updateCount();
   }
 
   restartGame() {

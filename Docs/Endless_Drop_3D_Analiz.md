@@ -137,7 +137,26 @@ core/
 - `docs/Miss_System_Changelog.md` - Miss sistem detayları
 - `ICON_README.md` - İkon özeti
 
-### v0.3 (2026-01-31) - YENİ!
+### v0.4 (2026-01-31) - MVP COMPLETE! 🏆
+
+#### ⏱️ Countdown System
+- Oyun başlamadan önce 3-2-1-GO! animasyonu eklendi.
+- Oyuncunun oyunun hızına ve pozisyonuna hazırlanması sağlandı.
+
+#### 📅 Daily Tasks UI
+- Arka planda çalışan görev sistemi arayüze bağlandı.
+- Görev ilerleme çubukları ve ödül (Gem) toplama mekanizması eklendi.
+
+#### ⚙️ Settings & Tilt Control
+- **Ayarlar Menüsü:** Müzik, Ses, Haptik ve Tilt açma/kapama seçenekleri.
+- **Tilt Control:** Telefonu sağa/sola eğerek topu kontrol etme özelliği eklendi (Opsiyonel).
+
+#### 🔧 Teknik İyileştirmeler
+- `DailyTaskUI.js` ve `SettingsUI.js` bileşenleri eklendi.
+- `Player.js`: `deviceorientation` desteği eklendi.
+- `main.js`: Countdown state yönetimi eklendi.
+
+### v0.3 (2026-01-31)
 
 #### 🛒 Ball Shop (Market Sistemi)
 - **Ekonomi:** Toplanan elmaslar (Gems) artık harcanabiliyor

@@ -1,8 +1,10 @@
 export class Menu {
-    constructor(onStart, onThemeChange, onShop) {
+    constructor(onStart, onThemeChange, onShop, onTasks, onSettings) {
         this.onStart = onStart;
         this.onThemeChange = onThemeChange;
         this.onShop = onShop;
+        this.onTasks = onTasks;
+        this.onSettings = onSettings;
         this.container = null;
         this.isVisible = false;
     }
@@ -89,15 +91,31 @@ export class Menu {
         };
         this.container.appendChild(shopBtn);
 
-        // Theme Selection (future feature)
-        const themeLabel = document.createElement('div');
-        themeLabel.textContent = 'Theme: Neon';
-        themeLabel.style.cssText = `
-            color: rgba(255,255,255,0.8);
-            font-size: var(--font-size-small, 18px);
-            margin-top: clamp(20px, 4vw, 30px);
+        // Tasks Button
+        const tasksBtn = document.createElement('button');
+        tasksBtn.textContent = 'TASKS 📅';
+        tasksBtn.className = 'menu-btn secondary';
+        tasksBtn.style.cssText += `
+            margin: 10px;
+            width: clamp(150px, 40vw, 250px);
         `;
-        this.container.appendChild(themeLabel);
+        tasksBtn.onclick = () => {
+            this.onTasks();
+        };
+        this.container.appendChild(tasksBtn);
+
+        // Settings Button
+        const settingsBtn = document.createElement('button');
+        settingsBtn.textContent = 'SETTINGS ⚙️';
+        settingsBtn.className = 'menu-btn secondary';
+        settingsBtn.style.cssText += `
+            margin: 10px;
+            width: clamp(150px, 40vw, 250px);
+        `;
+        settingsBtn.onclick = () => {
+            this.onSettings();
+        };
+        this.container.appendChild(settingsBtn);
 
         // High Score Display
         const highScore = localStorage.getItem('endless_drop_highscore') || 0;
@@ -106,7 +124,7 @@ export class Menu {
         scoreLabel.style.cssText = `
             color: rgba(255,255,255,0.9);
             font-size: var(--font-size-body, 24px);
-            margin-top: clamp(15px, 3vw, 20px);
+            margin-top: 30px;
             font-weight: bold;
         `;
         this.container.appendChild(scoreLabel);

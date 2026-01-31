@@ -23,11 +23,26 @@ export class Player {
         this.lastTouchX = 0;
         this.isDragging = false;
         this.sensitivity = 0.015; // Setup for relative sensitivity
+        this.tiltSensitivity = 0.15;
+        this.useTilt = false;
 
         this.setupInput();
     }
 
     setupInput() {
+        // Tilt Control (Mobile accelerometer)
+        window.addEventListener('deviceorientation', (e) => {
+            if (!this.useTilt) return;
+            // gamma is left-to-right tilt in degrees [-90, 90]
+            if (e.gamma !== null) {
+                const tiltX = e.gamma;
+                // Add some deadzone and smooth movement
+                if (Math.abs(tiltX) > 2) {
+                    this.moveHorizontal(tiltX * this.tiltSensitivity * 0.1);
+                }
+            }
+        });
+
         // Touch events for mobile
         window.addEventListener('touchstart', (e) => {
             this.isDragging = true;
