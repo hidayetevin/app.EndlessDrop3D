@@ -1,7 +1,8 @@
 export class GameOver {
-    constructor(onRestart, onMenu, language) {
+    constructor(onRestart, onMenu, language, onReward) {
         this.onRestart = onRestart;
         this.onMenu = onMenu;
+        this.onReward = onReward;
         this.lang = language;
         this.container = null;
     }
@@ -10,6 +11,7 @@ export class GameOver {
         if (this.container) {
             this.updateStats(score, highScore, gems, maxCombo);
             this.container.style.display = 'flex';
+            this.resetButtons();
             return;
         }
 
@@ -21,7 +23,7 @@ export class GameOver {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -47,99 +49,88 @@ export class GameOver {
             background: rgba(255,255,255,0.1);
             padding: var(--spacing-md, 30px);
             border-radius: 20px;
-            margin-bottom: clamp(20px, 4vw, 30px);
+            margin-bottom: clamp(10px, 2vw, 15px);
             max-width: 90vw;
+            width: 300px;
         `;
 
-
-        // Score
         this.scoreLabel = document.createElement('div');
-        this.scoreLabel.style.cssText = `
-            color: white;
-            font-size: var(--font-size-h2, 32px);
-            margin: clamp(8px, 2vw, 10px) 0;
-        `;
         statsContainer.appendChild(this.scoreLabel);
-
-        // High Score
         this.highScoreLabel = document.createElement('div');
-        this.highScoreLabel.style.cssText = `
-            color: #ffaa00;
-            font-size: var(--font-size-body, 28px);
-            margin: clamp(8px, 2vw, 10px) 0;
-        `;
         statsContainer.appendChild(this.highScoreLabel);
-
-        // Gems
         this.gemsLabel = document.createElement('div');
-        this.gemsLabel.style.cssText = `
-            color: #ffff00;
-            font-size: var(--font-size-body, 24px);
-            margin: clamp(8px, 2vw, 10px) 0;
-        `;
         statsContainer.appendChild(this.gemsLabel);
-
-        // Max Combo
         this.comboLabel = document.createElement('div');
-        this.comboLabel.style.cssText = `
-            color: #00ffff;
-            font-size: var(--font-size-small, 20px);
-            margin: clamp(8px, 2vw, 10px) 0;
-        `;
         statsContainer.appendChild(this.comboLabel);
-
         this.container.appendChild(statsContainer);
+
+        // 2X Earn Button (Visible first)
+        this.rewardBtn = document.createElement('button');
+        this.rewardBtn.textContent = this.lang.get('EARN_2X');
+        this.rewardBtn.style.cssText = `
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #ffff00;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255,255,0,0.5);
+            animation: pulse 1.5s infinite;
+        `;
+        this.rewardBtn.onclick = () => {
+            this.onReward();
+            this.rewardBtn.style.display = 'none';
+        };
+        this.container.appendChild(this.rewardBtn);
+
+        // Normal Buttons Container (Hidden initially)
+        this.btnContainer = document.createElement('div');
+        this.btnContainer.style.cssText = `
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        `;
 
         // Restart Button
         const restartBtn = document.createElement('button');
         restartBtn.textContent = this.lang.get('RESTART');
-        restartBtn.style.cssText = `
-            padding: var(--btn-padding, 15px 50px);
-            font-size: var(--btn-font-size, 28px);
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            margin: clamp(8px, 2vw, 10px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
-            min-height: 44px;
-        `;
-        restartBtn.ontouchstart = restartBtn.onmouseover = () => restartBtn.style.transform = 'scale(1.05)';
-        restartBtn.ontouchend = restartBtn.onmouseout = () => restartBtn.style.transform = 'scale(1)';
+        restartBtn.className = 'menu-btn primary';
+        restartBtn.style.margin = '10px';
         restartBtn.onclick = () => {
             this.hide();
             this.onRestart();
         };
-        this.container.appendChild(restartBtn);
+        this.btnContainer.appendChild(restartBtn);
 
         // Menu Button
         const menuBtn = document.createElement('button');
         menuBtn.textContent = this.lang.get('MAIN_MENU');
-        menuBtn.style.cssText = `
-            padding: clamp(10px, 2.5vw, 12px) clamp(30px, 5vw, 40px);
-            font-size: var(--font-size-small, 20px);
-            background: rgba(255,255,255,0.2);
-            border: 2px solid white;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            margin: clamp(8px, 2vw, 10px);
-            transition: background 0.2s;
-            min-height: 44px;
-        `;
-        menuBtn.ontouchstart = menuBtn.onmouseover = () => menuBtn.style.background = 'rgba(255,255,255,0.3)';
-        menuBtn.ontouchend = menuBtn.onmouseout = () => menuBtn.style.background = 'rgba(255,255,255,0.2)';
+        menuBtn.className = 'menu-btn secondary';
+        menuBtn.style.margin = '10px';
         menuBtn.onclick = () => {
             this.hide();
             this.onMenu();
         };
-        this.container.appendChild(menuBtn);
+        this.btnContainer.appendChild(menuBtn);
+
+        this.container.appendChild(this.btnContainer);
 
         document.body.appendChild(this.container);
         this.updateStats(score, highScore, gems, maxCombo);
+        this.resetButtons();
+    }
+
+    resetButtons() {
+        this.rewardBtn.style.display = 'block';
+        this.btnContainer.style.display = 'none';
+
+        setTimeout(() => {
+            this.btnContainer.style.display = 'flex';
+        }, 2000);
     }
 
     updateStats(score, highScore, gems, maxCombo) {
@@ -148,8 +139,8 @@ export class GameOver {
         }
         if (this.highScoreLabel) {
             const isNewRecord = score > highScore;
-            this.highScoreLabel.textContent = isNewRecord ?
-                `🎉 NEW HIGH SCORE: ${score}` :
+            this.highScoreLabel.innerHTML = isNewRecord ?
+                `<span style="color: #00ff88">🎉 NEW HIGH SCORE</span>` :
                 `${this.lang.get('HIGH_SCORE')}: ${highScore}`;
         }
         if (this.gemsLabel) {
@@ -166,4 +157,5 @@ export class GameOver {
         }
     }
 }
+
 

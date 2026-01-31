@@ -21,11 +21,14 @@ import { SkinConfig } from './core/SkinConfig.js';
 import { DailyTaskUI } from './ui/DailyTaskUI.js';
 import { SettingsUI } from './ui/SettingsUI.js';
 import { LanguageManager } from './core/LanguageManager.js';
+import { AdManager } from './core/AdManager.js';
 
 class Game {
   constructor() {
     this.storage = new StorageManager();
     this.lang = new LanguageManager(this.storage);
+    this.ads = new AdManager();
+    this.gemsCollectedThisRun = 0;
 
     this.sceneManager = new SceneManager();
     this.cameraManager = new CameraManager();
@@ -55,7 +58,12 @@ class Game {
     this.shop = new Shop(this.storage, (skinId) => this.applySkin(skinId), this.lang);
     this.taskUI = new DailyTaskUI(this.storage, this.dailyTasks, this.lang);
     this.settingsUI = new SettingsUI(this.storage, (key, val) => this.applySetting(key, val), this.lang);
-    this.gameOverScreen = new GameOver(() => this.restartGame(), () => this.showMenu(), this.lang);
+    this.gameOverScreen = new GameOver(
+      () => this.restartGame(),
+      () => this.showMenu(),
+      this.lang,
+      () => this.showRewardedAd()
+    );
 
     this.sceneManager.setCamera(this.cameraManager.camera);
     this.cameraManager.setTarget(this.player.mesh);
@@ -63,6 +71,7 @@ class Game {
     this.gameLoop = new GameLoop(this.update.bind(this));
 
     this.init();
+    this.ads.initialize();
   }
 
   init() {
@@ -171,6 +180,7 @@ class Game {
     this.gameState.state = 'COUNTDOWN';
     this.gameState.reset();
     this.player.reset();
+    this.gemsCollectedThisRun = 0;
 
     // Apply selected skin and settings
     this.applySkin(this.storage.data.selectedSkin);
@@ -192,32 +202,21 @@ class Game {
     const updateCount = () => {
       if (count > 0) {
         this.countdownText.textContent = count;
-        this.audio.playCoin(); // Use a beep sound placeholder
+        this.audio.playCoin();
         count--;
         setTimeout(updateCount, 1000);
       } else {
         this.countdownText.textContent = 'GO!';
-        this.audio.playPerfect(); // Preparing for takeoff
+        this.audio.playPerfect();
         setTimeout(() => {
           this.countdownOverlay.style.display = 'none';
           this.gameState.state = 'PLAYING';
           this.storage.incrementStat('totalGamesPlayed');
-          console.log("Game started!");
         }, 500);
       }
     };
 
     updateCount();
-  }
-
-  restartGame() {
-    // Clean up and restart
-    this.startGame();
-  }
-
-  showMenu() {
-    this.hud.hide();
-    this.menu.show();
   }
 
   changeTheme(theme) {
@@ -349,6 +348,7 @@ class Game {
     for (const item of collected) {
       if (item.type === 'gem') {
         this.gameState.addGem();
+        this.gemsCollectedThisRun++;
         this.audio.playCoin();
         this.haptic.light();
         this.dailyTasks.updateProgress('gems', 1);
@@ -371,6 +371,37 @@ class Game {
     this.hud.updateScore(state.score);
     this.hud.updateGems(state.gems);
     this.hud.showShield(this.bonusSystem.activeEffects.shield);
+  }
+
+  showRewardedAd() {
+    this.ads.showRewarded((success) => {
+      if (success) {
+        console.log("Adding reward: " + this.gemsCollectedThisRun + " extra gems");
+        this.storage.addGems(this.gemsCollectedThisRun);
+        this.gameOverScreen.updateStats(
+          this.gameState.score,
+          this.storage.getHighScore(),
+          this.storage.getTotalGems(),
+          this.gameState.maxCombo
+        );
+      }
+    });
+  }
+
+  restartGame() {
+    if (this.gameState.state === 'GAME_OVER') {
+      this.ads.showInterstitial();
+    }
+    // Clean up and restart
+    this.startGame();
+  }
+
+  showMenu() {
+    if (this.gameState.state === 'GAME_OVER') {
+      this.ads.showInterstitial();
+    }
+    this.hud.hide();
+    this.menu.show();
   }
 }
 

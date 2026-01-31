@@ -11,31 +11,33 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* Responsive font sizes */
   --font-size-h1: clamp(32px, 8vw, 56px);
   --font-size-h2: clamp(24px, 6vw, 40px);
   --font-size-score: clamp(24px, 5vw, 36px);
   --font-size-body: clamp(16px, 4vw, 24px);
   --font-size-small: clamp(14px, 3.5vw, 20px);
-  
+
   /* Responsive spacing */
   --spacing-xs: clamp(8px, 2vw, 12px);
   --spacing-sm: clamp(12px, 3vw, 20px);
   --spacing-md: clamp(20px, 4vw, 30px);
   --spacing-lg: clamp(30px, 5vw, 50px);
-  
+
   /* Button sizes */
   --btn-padding: clamp(12px, 3vw, 20px) clamp(30px, 6vw, 60px);
   --btn-font-size: clamp(18px, 4.5vw, 32px);
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
   position: fixed;
-  touch-action: none; /* Prevent default touch behaviors */
+  touch-action: none;
+  /* Prevent default touch behaviors */
 }
 
 body {
@@ -116,35 +118,50 @@ body {
     padding-right: env(safe-area-inset-right);
   }
 }
+
 /* UI Components */
 .menu-btn {
-    padding: var(--btn-padding, 15px 40px);
-    font-size: var(--btn-font-size, 24px);
-    font-weight: bold;
-    border: none;
-    border-radius: 50px;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
-    min-height: 44px;
-    pointer-events: auto !important;
+  padding: var(--btn-padding, 15px 40px);
+  font-size: var(--btn-font-size, 24px);
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 44px;
+  pointer-events: auto !important;
 }
 
 .menu-btn.primary {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 .menu-btn.secondary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .menu-btn:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
 }
 
 .menu-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
     transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
