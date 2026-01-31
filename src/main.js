@@ -16,6 +16,8 @@ import { StorageManager } from './core/StorageManager.js';
 import { DailyTaskManager } from './core/DailyTaskManager.js';
 import { AudioManager } from './core/AudioManager.js';
 import { HapticManager } from './core/HapticManager.js';
+import { Shop } from './ui/Shop.js';
+import { SkinConfig } from './core/SkinConfig.js';
 
 class Game {
   constructor() {
@@ -36,8 +38,13 @@ class Game {
     this.haptic = new HapticManager();
 
     // UI Components
-    this.menu = new Menu(() => this.startGame(), (theme) => this.changeTheme(theme));
+    this.menu = new Menu(
+      () => this.startGame(),
+      (theme) => this.changeTheme(theme),
+      () => this.showShop()
+    );
     this.hud = new HUD();
+    this.shop = new Shop(this.storage, (skinId) => this.applySkin(skinId));
     this.gameOverScreen = new GameOver(() => this.restartGame(), () => this.showMenu());
 
     this.sceneManager.setCamera(this.cameraManager.camera);
@@ -57,6 +64,9 @@ class Game {
       this.themeManager.setLights(lights[0], lights[1]);
     }
     this.themeManager.reset(); // Apply initial biome
+
+    // Apply initial skin
+    this.applySkin(this.storage.data.selectedSkin);
 
     this.hud.create();
     this.hud.setPauseCallbacks(
@@ -89,9 +99,22 @@ class Game {
     this.audio.stop(); // Stop game music
   }
 
+  showShop() {
+    this.shop.show();
+  }
+
+  applySkin(skinId) {
+    const skinData = SkinConfig.skins[skinId];
+    this.player.setSkin(skinData);
+  }
+
   startGame() {
     this.gameState.reset();
     this.player.reset();
+
+    // Apply selected skin from storage
+    this.applySkin(this.storage.data.selectedSkin);
+
     this.obstacleFactory.reset();
     this.bonusSystem.reset();
     this.themeManager.reset();

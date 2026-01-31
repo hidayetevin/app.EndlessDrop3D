@@ -11,7 +11,8 @@ export class Player {
         });
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.castShadow = true;
-        scene.add(this.mesh);
+        this.scene = scene;
+        this.scene.add(this.mesh);
 
         // Physics properties
         this.velocity = new THREE.Vector3(0, -5, 0); // Initial downward speed
@@ -98,5 +99,18 @@ export class Player {
 
         // Reset input state
         this.isDragging = false;
+    }
+
+    setSkin(skinData) {
+        if (!skinData) return;
+
+        this.mesh.material.color.setHex(skinData.color);
+        this.mesh.material.roughness = skinData.roughness;
+        this.mesh.material.metalness = skinData.metalness;
+
+        if (skinData.emissive !== undefined) {
+            this.mesh.material.emissive.setHex(skinData.emissive);
+            this.mesh.material.emissiveIntensity = skinData.emissiveIntensity;
+        }
     }
 }

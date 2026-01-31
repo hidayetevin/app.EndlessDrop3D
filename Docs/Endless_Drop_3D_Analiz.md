@@ -137,7 +137,26 @@ core/
 - `docs/Miss_System_Changelog.md` - Miss sistem detayları
 - `ICON_README.md` - İkon özeti
 
-### v0.1 (Initial)
+### v0.3 (2026-01-31) - YENİ!
+
+#### 🛒 Ball Shop (Market Sistemi)
+- **Ekonomi:** Toplanan elmaslar (Gems) artık harcanabiliyor
+- **Skin Sistemi:** Farklı renk, parlaklık ve materyal özelliklerine sahip top görünümleri
+- **Skinler:**
+  - Classic Red (Ücretsiz)
+  - Neon Blue (5 Gem)
+  - Emerald City (10 Gem)
+  - Midas Gold (15 Gem)
+  - Void Sphere (30 Gem)
+- **Persistency:** Satın alınan skinler local storage'a kaydedilir
+- **UI:** Ana menüye SHOP butonu ve tam donanımlı market arayüzü eklendi
+
+#### 🔧 Teknik İyileştirmeler
+- `Player.js`: `setSkin` metodu ile dinamik materyal güncelleme
+- `Shop.js`: Gem kontrolü ve satın alma mantığına sahip yeni UI bileşeni
+- `SkinConfig.js`: Tüm skin verilerinin merkezi yönetimi
+
+### v0.2 (2026-01-31)
 - Temel oyun mekaniği
 - 3D scene setup
 - Player controls

@@ -1,7 +1,8 @@
 export class Menu {
-    constructor(onStart, onThemeChange) {
+    constructor(onStart, onThemeChange, onShop) {
         this.onStart = onStart;
         this.onThemeChange = onThemeChange;
+        this.onShop = onShop;
         this.container = null;
         this.isVisible = false;
     }
@@ -74,6 +75,19 @@ export class Menu {
             this.onStart();
         };
         this.container.appendChild(playBtn);
+
+        // Shop Button
+        const shopBtn = document.createElement('button');
+        shopBtn.textContent = 'SHOP 💎';
+        shopBtn.className = 'menu-btn secondary';
+        shopBtn.style.cssText += `
+            margin: 10px;
+            width: clamp(150px, 40vw, 250px);
+        `;
+        shopBtn.onclick = () => {
+            this.onShop();
+        };
+        this.container.appendChild(shopBtn);
 
         // Theme Selection (future feature)
         const themeLabel = document.createElement('div');
