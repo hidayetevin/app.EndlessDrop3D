@@ -1,0 +1,23 @@
+{
+    "name": "Endless Drop 3D",
+    "short_name": "Endless Drop",
+    "description": "Swipe to control the falling ball, dodge obstacles, and survive in this fast 3D game!",
+    "start_url": "/",
+    "display": "fullscreen",
+    "orientation": "portrait",
+    "background_color": "#1a0f2e",
+    "theme_color": "#00d9ff",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "games",
+        "entertainment"
+    ],
+    "lang": "en-US"
+}
