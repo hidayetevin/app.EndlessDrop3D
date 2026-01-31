@@ -3,9 +3,9 @@ import * as THREE from 'three';
 export class CollisionSystem {
     constructor() {
         this.playerRadius = 0.5; // Sphere radius
-        this.ringInnerRadius = 2.7; // Safe zone (slightly smaller than visual)
-        this.ringOuterRadius = 3.3; // Danger zone
-        this.perfectZoneRadius = 0.3; // Perfect pass tolerance
+        this.ringInnerRadius = 1.2; // Safe zone - Küçültüldü: 2.7 -> 1.2
+        this.ringOuterRadius = 1.7; // Danger zone - Küçültüldü: 3.3 -> 1.7
+        this.perfectZoneRadius = 0.2; // Perfect pass tolerance - Biraz küçültüldü
     }
 
     // AABB-based collision (simplified for ring)
@@ -19,10 +19,10 @@ export class CollisionSystem {
             const deltaY = Math.abs(playerPos.y - ring.position.y);
 
             if (deltaY < 0.5) { // Player is passing through ring plane
-                const distanceFromCenter = Math.sqrt(
-                    playerPos.x * playerPos.x +
-                    playerPos.z * playerPos.z
-                );
+                // Halka merkezine göre mesafe hesapla (X offseti dikkate al)
+                const dx = playerPos.x - ring.position.x;
+                const dz = playerPos.z - ring.position.z;
+                const distanceFromCenter = Math.sqrt(dx * dx + dz * dz);
 
                 // Check perfect pass (very center)
                 if (distanceFromCenter < this.perfectZoneRadius && !ring.userData.isPerfect) {

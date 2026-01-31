@@ -7,11 +7,16 @@ export class ObstacleFactory {
         this.activeObstacles = [];
         this.poolSize = 20; // Object pooling for performance
 
+
         // Spawn settings
         this.spawnDistance = 15;
         this.minSpacing = 8;
         this.maxSpacing = 12;
         this.currentSpacing = this.maxSpacing;
+
+        // X position variation
+        this.minXOffset = -2; // Sol limit
+        this.maxXOffset = 2;  // Sağ limit
 
         this.lastSpawnY = 0;
 
@@ -32,7 +37,7 @@ export class ObstacleFactory {
     createRing() {
         // PLACEHOLDER: Using TorusGeometry until .glb model is provided
         // Production: Load from assets/models/ring.glb using GLTFLoader
-        const geometry = new THREE.TorusGeometry(3, 0.3, 16, 32);
+        const geometry = new THREE.TorusGeometry(1.5, 0.2, 16, 32); // Küçültüldü: 3 -> 1.5
         const material = new THREE.MeshStandardMaterial({
             color: 0x00ffff,
             roughness: 0.3,
@@ -78,7 +83,11 @@ export class ObstacleFactory {
 
         if (this.lastSpawnY - targetY > this.currentSpacing) {
             const ring = this.getFromPool();
-            ring.position.set(0, targetY, 0);
+
+            // Rastgele X pozisyonu
+            const randomX = this.minXOffset + Math.random() * (this.maxXOffset - this.minXOffset);
+
+            ring.position.set(randomX, targetY, 0);
             ring.visible = true;
             this.activeObstacles.push(ring);
 
