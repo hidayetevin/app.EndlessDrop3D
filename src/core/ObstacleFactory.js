@@ -123,4 +123,15 @@ export class ObstacleFactory {
     getActiveObstacles() {
         return this.activeObstacles;
     }
+
+    reset() {
+        // Return all active obstacles to pool
+        for (let i = this.activeObstacles.length - 1; i >= 0; i--) {
+            this.returnToPool(this.activeObstacles[i]);
+        }
+
+        // Reset spawn state
+        this.lastSpawnY = 0;
+        this.currentSpacing = this.maxSpacing;
+    }
 }

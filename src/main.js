@@ -65,6 +65,8 @@ class Game {
 
   startGame() {
     this.gameState.reset();
+    this.player.reset();
+    this.obstacleFactory.reset();
     this.bonusSystem.reset();
     this.themeManager.reset();
     this.hud.show();

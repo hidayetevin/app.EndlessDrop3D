@@ -126,8 +126,9 @@ core/
 
 #### 📝 Teknik Değişiklikler
 - `CollisionSystem.js`: Miss detection + improved distance calculation
-- `ObstacleFactory.js`: Ring size + random X position + userData reset
-- `main.js`: Miss handler + game over logic
+- `ObstacleFactory.js`: Ring size + random X position + userData reset + **reset() method**
+- `Player.js`: **reset() method** added to re-center ball
+- `main.js`: Miss handler + game over logic + **restart cleanup logic**
 - `index.html`: Icon integration + PWA manifest
 
 #### 📚 Dokümanlar

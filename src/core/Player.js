@@ -87,4 +87,16 @@ export class Player {
         this.mesh.rotation.x -= 2 * dt;
         this.mesh.rotation.z -= this.velocity.y * 0.1 * dt;
     }
+
+    reset() {
+        // Reset position to start
+        this.mesh.position.set(0, 0, 0);
+        this.mesh.rotation.set(0, 0, 0);
+
+        // Reset velocity
+        this.velocity.set(0, -5, 0);
+
+        // Reset input state
+        this.isDragging = false;
+    }
 }
