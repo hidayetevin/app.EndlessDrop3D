@@ -200,6 +200,8 @@ class Game {
     console.log(`Setting changed: ${key} = ${val}`);
     if (key === 'tiltEnabled') {
       this.player.useTilt = val;
+    } else if (key === 'tiltSensitivity') {
+      this.player.tiltSensitivity = val;
     } else if (key === 'musicEnabled') {
       if (val) this.audio.resume(); else this.audio.pause();
     } else if (key === 'language') {
@@ -253,6 +255,7 @@ class Game {
     // Apply selected skin and settings
     this.applySkin(this.storage.data.selectedSkin);
     this.player.useTilt = this.storage.data.settings.tiltEnabled;
+    this.player.tiltSensitivity = this.storage.data.settings.tiltSensitivity || 1.2;
 
     this.obstacleFactory.reset();
     this.bonusSystem.reset();

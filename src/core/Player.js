@@ -23,7 +23,7 @@ export class Player {
         this.lastTouchX = 0;
         this.isDragging = false;
         this.sensitivity = 0.015; // Setup for relative sensitivity
-        this.tiltSensitivity = 2.0;
+        this.tiltSensitivity = 1.2;
         this.useTilt = false;
 
         this.setupInput();

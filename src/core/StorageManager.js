@@ -17,6 +17,7 @@ export class StorageManager {
                 musicEnabled: true,
                 hapticEnabled: true,
                 tiltEnabled: false,
+                tiltSensitivity: 1.2,
                 language: 'en'
             },
             dailyTasks: {

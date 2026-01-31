@@ -66,8 +66,54 @@ export class SettingsUI {
         this.addToggle(this.lang.get('MUSIC'), 'musicEnabled');
         this.addToggle(this.lang.get('SOUND_FX'), 'soundEnabled');
         this.addToggle(this.lang.get('HAPTICS'), 'hapticEnabled');
-        this.addToggle(this.lang.get('TILT_CONTROL'), 'tiltEnabled');
+        this.addToggle(this.lang.get('TILT_CONTROL'), 'tiltEnabled', (val) => this.update());
+
+        if (this.storage.data.settings.tiltEnabled) {
+            this.addSlider(this.lang.get('SENSITIVITY'), 'tiltSensitivity', 0.5, 1.5, 0.1);
+        }
+
         this.addLanguageSelector();
+    }
+
+    addSlider(label, key, min, max, step) {
+        const row = document.createElement('div');
+        row.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 10px;
+        `;
+
+        const header = document.createElement('div');
+        header.style.cssText = `display: flex; justify-content: space-between; color: white;`;
+        const name = document.createElement('div');
+        name.textContent = label;
+        header.appendChild(name);
+
+        const valueDisplay = document.createElement('div');
+        valueDisplay.textContent = parseFloat(this.storage.data.settings[key]).toFixed(1);
+        header.appendChild(valueDisplay);
+        row.appendChild(header);
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = min;
+        slider.max = max;
+        slider.step = step;
+        slider.value = this.storage.data.settings[key];
+        slider.style.width = '100%';
+        slider.oninput = (e) => {
+            const val = parseFloat(e.target.value);
+            valueDisplay.textContent = val.toFixed(1);
+            this.storage.updateSetting(key, val);
+            if (this.onSettingChange) this.onSettingChange(key, val);
+        };
+        row.appendChild(slider);
+
+        this.optionsList.appendChild(row);
     }
 
     addLanguageSelector() {
@@ -102,7 +148,7 @@ export class SettingsUI {
         this.optionsList.appendChild(row);
     }
 
-    addToggle(label, key) {
+    addToggle(label, key, onToggle) {
         const row = document.createElement('div');
         row.style.cssText = `
             display: flex;
@@ -149,6 +195,8 @@ export class SettingsUI {
 
             toggle.style.background = newValue ? '#00ff88' : '#444';
             knob.style.left = newValue ? '33px' : '3px';
+
+            if (onToggle) onToggle(newValue);
 
             if (this.onSettingChange) {
                 this.onSettingChange(key, newValue);
