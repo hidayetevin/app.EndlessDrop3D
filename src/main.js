@@ -180,8 +180,19 @@ class Game {
     this.gameState.state = 'MENU';
     this.hud.showPauseMenu(false);
     this.hud.hide();
+
+    // Hide overlays
+    if (this.tapOverlay) this.tapOverlay.style.display = 'none';
+    if (this.countdownOverlay) this.countdownOverlay.style.display = 'none';
+
     this.menu.show();
     this.audio.stop(); // Stop game music
+
+    // Reset game elements so they don't persist in background
+    this.player.reset();
+    this.obstacleFactory.reset();
+    this.bonusSystem.reset();
+    this.themeManager.reset();
   }
 
   showShop() {
