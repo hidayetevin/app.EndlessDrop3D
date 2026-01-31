@@ -1,9 +1,10 @@
 import { SkinConfig } from '../core/SkinConfig.js';
 
 export class Shop {
-    constructor(storage, onSkinSelect) {
+    constructor(storage, onSkinSelect, language) {
         this.storage = storage;
         this.onSkinSelect = onSkinSelect;
+        this.lang = language;
         this.container = null;
         this.isVisible = false;
     }
@@ -46,7 +47,7 @@ export class Shop {
         `;
 
         const title = document.createElement('h1');
-        title.textContent = 'BALL SHOP';
+        title.textContent = this.lang.get('BALL_SHOP');
         title.style.cssText = `color: white; font-size: 32px; margin: 0;`;
         header.appendChild(title);
 
@@ -70,7 +71,7 @@ export class Shop {
 
         // Back Button
         const backBtn = document.createElement('button');
-        backBtn.textContent = 'BACK';
+        backBtn.textContent = this.lang.get('BACK');
         backBtn.className = 'menu-btn secondary';
         backBtn.style.margin = '40px 0';
         backBtn.onclick = () => this.hide();
@@ -119,7 +120,7 @@ export class Shop {
             card.appendChild(preview);
 
             const name = document.createElement('div');
-            name.textContent = skin.name;
+            name.textContent = this.lang.get('SKIN_' + id);
             name.style.cssText = `color: white; font-weight: bold; margin-bottom: 10px; text-align: center;`;
             card.appendChild(name);
 
@@ -134,12 +135,12 @@ export class Shop {
             `;
 
             if (selected === id) {
-                btn.textContent = 'SELECTED';
+                btn.textContent = this.lang.get('SELECTED');
                 btn.style.background = '#00ff88';
                 btn.style.color = 'black';
                 btn.disabled = true;
             } else if (unlocked.includes(id)) {
-                btn.textContent = 'SELECT';
+                btn.textContent = this.lang.get('SELECT');
                 btn.style.background = 'white';
                 btn.onclick = () => {
                     this.storage.setSelectedSkin(id);

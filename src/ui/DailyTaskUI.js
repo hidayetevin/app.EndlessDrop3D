@@ -1,7 +1,8 @@
 export class DailyTaskUI {
-    constructor(storage, dailyTaskManager) {
+    constructor(storage, dailyTaskManager, language) {
         this.storage = storage;
         this.taskManager = dailyTaskManager;
+        this.lang = language;
         this.container = null;
         this.isVisible = false;
     }
@@ -32,7 +33,7 @@ export class DailyTaskUI {
         `;
 
         const title = document.createElement('h1');
-        title.textContent = 'DAILY MISSIONS';
+        title.textContent = this.lang.get('DAILY_MISSIONS');
         title.style.cssText = `color: white; font-size: 28px; margin-bottom: 30px; letter-spacing: 2px;`;
         this.container.appendChild(title);
 
@@ -47,7 +48,7 @@ export class DailyTaskUI {
         this.container.appendChild(this.taskList);
 
         const backBtn = document.createElement('button');
-        backBtn.textContent = 'BACK';
+        backBtn.textContent = this.lang.get('BACK');
         backBtn.className = 'menu-btn secondary';
         backBtn.style.margin = '40px 0';
         backBtn.onclick = () => this.hide();
@@ -82,14 +83,15 @@ export class DailyTaskUI {
             const info = document.createElement('div');
             info.style.cssText = `display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;`;
 
+            const desc = this.lang.get('DESC_' + task.id);
             const textContent = document.createElement('div');
-            textContent.innerHTML = `<div style="color: white; font-weight: bold;">${task.desc}</div>
-                                     <div style="color: #aaa; font-size: 14px;">Reward: 💎 ${task.reward}</div>`;
+            textContent.innerHTML = `<div style="color: white; font-weight: bold;">${desc}</div>
+                                     <div style="color: #aaa; font-size: 14px;">${this.lang.get('REWARD')}: 💎 ${task.reward}</div>`;
             info.appendChild(textContent);
 
             if (isClaimed) {
                 const badge = document.createElement('div');
-                badge.textContent = '✅ CLAIMED';
+                badge.textContent = this.lang.get('CLAIMED');
                 badge.style.cssText = `color: #00ff88; font-size: 12px; font-weight: bold;`;
                 info.appendChild(badge);
             }
@@ -118,7 +120,7 @@ export class DailyTaskUI {
 
             if (canClaim) {
                 const claimBtn = document.createElement('button');
-                claimBtn.textContent = 'CLAIM REWARD';
+                claimBtn.textContent = this.lang.get('CLAIM_REWARD');
                 claimBtn.style.cssText = `
                     margin-top: 15px;
                     padding: 8px;

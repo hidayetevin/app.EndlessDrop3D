@@ -15,7 +15,9 @@ export class StorageManager {
             settings: {
                 soundEnabled: true,
                 musicEnabled: true,
-                hapticEnabled: true
+                hapticEnabled: true,
+                tiltEnabled: false,
+                language: 'en'
             },
             dailyTasks: {
                 lastReset: new Date().toDateString(),

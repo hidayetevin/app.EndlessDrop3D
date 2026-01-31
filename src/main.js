@@ -20,9 +20,13 @@ import { Shop } from './ui/Shop.js';
 import { SkinConfig } from './core/SkinConfig.js';
 import { DailyTaskUI } from './ui/DailyTaskUI.js';
 import { SettingsUI } from './ui/SettingsUI.js';
+import { LanguageManager } from './core/LanguageManager.js';
 
 class Game {
   constructor() {
+    this.storage = new StorageManager();
+    this.lang = new LanguageManager(this.storage);
+
     this.sceneManager = new SceneManager();
     this.cameraManager = new CameraManager();
     this.player = new Player(this.sceneManager.scene);
@@ -34,7 +38,6 @@ class Game {
     this.themeManager = new ThemeManager(this.sceneManager.scene);
 
     // Core Systems
-    this.storage = new StorageManager();
     this.dailyTasks = new DailyTaskManager(this.storage);
     this.audio = new AudioManager();
     this.haptic = new HapticManager();
@@ -45,13 +48,14 @@ class Game {
       (theme) => this.changeTheme(theme),
       () => this.showShop(),
       () => this.showTasks(),
-      () => this.showSettings()
+      () => this.showSettings(),
+      this.lang
     );
-    this.hud = new HUD();
-    this.shop = new Shop(this.storage, (skinId) => this.applySkin(skinId));
-    this.taskUI = new DailyTaskUI(this.storage, this.dailyTasks);
-    this.settingsUI = new SettingsUI(this.storage, (key, val) => this.applySetting(key, val));
-    this.gameOverScreen = new GameOver(() => this.restartGame(), () => this.showMenu());
+    this.hud = new HUD(this.lang);
+    this.shop = new Shop(this.storage, (skinId) => this.applySkin(skinId), this.lang);
+    this.taskUI = new DailyTaskUI(this.storage, this.dailyTasks, this.lang);
+    this.settingsUI = new SettingsUI(this.storage, (key, val) => this.applySetting(key, val), this.lang);
+    this.gameOverScreen = new GameOver(() => this.restartGame(), () => this.showMenu(), this.lang);
 
     this.sceneManager.setCamera(this.cameraManager.camera);
     this.cameraManager.setTarget(this.player.mesh);
@@ -124,8 +128,38 @@ class Game {
       this.player.useTilt = val;
     } else if (key === 'musicEnabled') {
       if (val) this.audio.resume(); else this.audio.pause();
+    } else if (key === 'language') {
+      this.refreshAllUI();
     }
     // Haptics and Sound FX are checked inside Manager classes usually
+  }
+
+  refreshAllUI() {
+    // Clear and force re-render of all UI components
+    if (this.menu.container) {
+      this.menu.container.remove();
+      this.menu.container = null;
+      this.menu.show();
+    }
+    if (this.hud.container) {
+      this.hud.container.remove();
+      this.hud.pauseMenu.remove();
+      this.hud.container = null;
+      this.hud.create(); // Re-create HUD
+      if (this.gameState.state === 'PLAYING') this.hud.show();
+    }
+    if (this.shop.container) {
+      this.shop.container.remove();
+      this.shop.container = null;
+    }
+    if (this.taskUI.container) {
+      this.taskUI.container.remove();
+      this.taskUI.container = null;
+    }
+    if (this.gameOverScreen.container) {
+      this.gameOverScreen.container.remove();
+      this.gameOverScreen.container = null;
+    }
   }
 
   applySkin(skinId) {

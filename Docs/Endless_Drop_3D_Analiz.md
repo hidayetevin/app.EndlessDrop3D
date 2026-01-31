@@ -151,6 +151,12 @@ core/
 - **Ayarlar Menüsü:** Müzik, Ses, Haptik ve Tilt açma/kapama seçenekleri.
 - **Tilt Control:** Telefonu sağa/sola eğerek topu kontrol etme özelliği eklendi (Opsiyonel).
 
+#### 🌍 Localization (Dil Desteği) - v0.4.1
+- **TR/EN Desteği:** Oyun artık Türkçe ve İngilizce dillerini tam destekler.
+- **Otomatik Algılama:** Sistem dili TR ise otomatik Türkçe başlar.
+- **Manuel Seçim:** Ayarlar menüsünden anlık dil değiştirme.
+- **Tüm UI:** Market, Görevler ve Menüler tamamen yerelleştirildi.
+
 #### 🔧 Teknik İyileştirmeler
 - `DailyTaskUI.js` ve `SettingsUI.js` bileşenleri eklendi.
 - `Player.js`: `deviceorientation` desteği eklendi.

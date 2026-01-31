@@ -1,10 +1,11 @@
 export class Menu {
-    constructor(onStart, onThemeChange, onShop, onTasks, onSettings) {
+    constructor(onStart, onThemeChange, onShop, onTasks, onSettings, language) {
         this.onStart = onStart;
         this.onThemeChange = onThemeChange;
         this.onShop = onShop;
         this.onTasks = onTasks;
         this.onSettings = onSettings;
+        this.lang = language;
         this.container = null;
         this.isVisible = false;
     }
@@ -13,6 +14,7 @@ export class Menu {
         if (this.container) {
             this.container.style.display = 'flex';
             this.isVisible = true;
+            this.updateHighScore();
             return;
         }
 
@@ -48,30 +50,9 @@ export class Menu {
 
         // Play Button
         const playBtn = document.createElement('button');
-        playBtn.textContent = 'PLAY';
-        playBtn.style.cssText = `
-            padding: var(--btn-padding, 20px 60px);
-            font-size: var(--btn-font-size, 32px);
-            font-weight: bold;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            margin: clamp(10px, 2vw, 20px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            min-height: 44px;
-            min-width: 120px;
-        `;
-        playBtn.ontouchstart = playBtn.onmouseover = () => {
-            playBtn.style.transform = 'scale(1.05)';
-            playBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.4)';
-        };
-        playBtn.ontouchend = playBtn.onmouseout = () => {
-            playBtn.style.transform = 'scale(1)';
-            playBtn.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
-        };
+        playBtn.textContent = this.lang.get('PLAY');
+        playBtn.className = 'menu-btn primary';
+        playBtn.style.margin = '10px';
         playBtn.onclick = () => {
             this.hide();
             this.onStart();
@@ -80,7 +61,7 @@ export class Menu {
 
         // Shop Button
         const shopBtn = document.createElement('button');
-        shopBtn.textContent = 'SHOP 💎';
+        shopBtn.textContent = this.lang.get('SHOP');
         shopBtn.className = 'menu-btn secondary';
         shopBtn.style.cssText += `
             margin: 10px;
@@ -93,7 +74,7 @@ export class Menu {
 
         // Tasks Button
         const tasksBtn = document.createElement('button');
-        tasksBtn.textContent = 'TASKS 📅';
+        tasksBtn.textContent = this.lang.get('TASKS');
         tasksBtn.className = 'menu-btn secondary';
         tasksBtn.style.cssText += `
             margin: 10px;
@@ -106,7 +87,7 @@ export class Menu {
 
         // Settings Button
         const settingsBtn = document.createElement('button');
-        settingsBtn.textContent = 'SETTINGS ⚙️';
+        settingsBtn.textContent = this.lang.get('SETTINGS');
         settingsBtn.className = 'menu-btn secondary';
         settingsBtn.style.cssText += `
             margin: 10px;
@@ -118,19 +99,25 @@ export class Menu {
         this.container.appendChild(settingsBtn);
 
         // High Score Display
-        const highScore = localStorage.getItem('endless_drop_highscore') || 0;
-        const scoreLabel = document.createElement('div');
-        scoreLabel.textContent = `High Score: ${highScore}`;
-        scoreLabel.style.cssText = `
+        this.scoreLabel = document.createElement('div');
+        this.scoreLabel.style.cssText = `
             color: rgba(255,255,255,0.9);
             font-size: var(--font-size-body, 24px);
             margin-top: 30px;
             font-weight: bold;
         `;
-        this.container.appendChild(scoreLabel);
+        this.container.appendChild(this.scoreLabel);
+        this.updateHighScore();
 
         document.body.appendChild(this.container);
         this.isVisible = true;
+    }
+
+    updateHighScore() {
+        const highScore = localStorage.getItem('endless_drop_highscore') || 0;
+        if (this.scoreLabel) {
+            this.scoreLabel.textContent = `${this.lang.get('HIGH_SCORE')}: ${highScore}`;
+        }
     }
 
     hide() {
@@ -140,3 +127,4 @@ export class Menu {
         }
     }
 }
+

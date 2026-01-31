@@ -1,5 +1,6 @@
 export class HUD {
-    constructor() {
+    constructor(language) {
+        this.lang = language;
         this.scoreDiv = null;
         this.comboDiv = null;
         this.gemsDiv = null;
@@ -115,7 +116,7 @@ export class HUD {
         `;
 
         const title = document.createElement('h2');
-        title.textContent = 'PAUSED';
+        title.textContent = this.lang.get('PAUSED');
         title.style.cssText = `
             color: white;
             font-size: 48px;
@@ -126,13 +127,13 @@ export class HUD {
         this.pauseMenu.appendChild(title);
 
         this.resumeBtn = document.createElement('button');
-        this.resumeBtn.textContent = 'RESUME';
+        this.resumeBtn.textContent = this.lang.get('RESUME');
         this.resumeBtn.className = 'menu-btn primary';
         this.resumeBtn.style.marginBottom = '20px';
         this.pauseMenu.appendChild(this.resumeBtn);
 
         this.menuBtn = document.createElement('button');
-        this.menuBtn.textContent = 'MAIN MENU';
+        this.menuBtn.textContent = this.lang.get('MAIN_MENU');
         this.menuBtn.className = 'menu-btn secondary';
         this.pauseMenu.appendChild(this.menuBtn);
 
@@ -165,7 +166,7 @@ export class HUD {
 
     showCombo(combo) {
         if (this.comboDiv) {
-            this.comboDiv.textContent = `PERFECT x${combo}`;
+            this.comboDiv.textContent = `${this.lang.get('PERFECT')} x${combo}`;
             this.comboDiv.style.display = 'block';
         }
     }

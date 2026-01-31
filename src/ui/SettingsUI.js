@@ -1,13 +1,15 @@
 export class SettingsUI {
-    constructor(storage, onSettingChange) {
+    constructor(storage, onSettingChange, language) {
         this.storage = storage;
         this.onSettingChange = onSettingChange;
+        this.lang = language;
         this.container = null;
         this.isVisible = false;
     }
 
     show() {
         if (this.container) {
+            this.update();
             this.container.style.display = 'flex';
             this.isVisible = true;
             return;
@@ -31,7 +33,7 @@ export class SettingsUI {
         `;
 
         const title = document.createElement('h1');
-        title.textContent = 'SETTINGS';
+        title.textContent = this.lang.get('SETTINGS');
         title.style.cssText = `color: white; font-size: 32px; margin-bottom: 50px; letter-spacing: 2px;`;
         this.container.appendChild(title);
 
@@ -45,14 +47,10 @@ export class SettingsUI {
         `;
         this.container.appendChild(this.optionsList);
 
-        // Settings items
-        this.addToggle('Music', 'musicEnabled');
-        this.addToggle('Sound FX', 'soundEnabled');
-        this.addToggle('Haptics', 'hapticEnabled');
-        this.addToggle('Tilt Control', 'tiltEnabled');
+        this.update();
 
         const backBtn = document.createElement('button');
-        backBtn.textContent = 'BACK';
+        backBtn.textContent = this.lang.get('BACK');
         backBtn.className = 'menu-btn secondary';
         backBtn.style.marginTop = '60px';
         backBtn.onclick = () => this.hide();
@@ -60,6 +58,48 @@ export class SettingsUI {
 
         document.body.appendChild(this.container);
         this.isVisible = true;
+    }
+
+    update() {
+        this.optionsList.innerHTML = '';
+        // Settings items
+        this.addToggle(this.lang.get('MUSIC'), 'musicEnabled');
+        this.addToggle(this.lang.get('SOUND_FX'), 'soundEnabled');
+        this.addToggle(this.lang.get('HAPTICS'), 'hapticEnabled');
+        this.addToggle(this.lang.get('TILT_CONTROL'), 'tiltEnabled');
+        this.addLanguageSelector();
+    }
+
+    addLanguageSelector() {
+        const row = document.createElement('div');
+        row.style.cssText = `display: flex; justify-content: space-between; align-items: center; width: 100%;`;
+
+        const name = document.createElement('div');
+        name.textContent = this.lang.get('LANGUAGE');
+        name.style.cssText = `color: white; font-size: 20px; font-weight: bold;`;
+        row.appendChild(name);
+
+        const btn = document.createElement('button');
+        const current = this.lang.currentLang;
+        btn.textContent = current === 'en' ? '🇬🇧 EN' : '🇹🇷 TR';
+        btn.style.cssText = `
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        `;
+        btn.onclick = () => {
+            const next = current === 'en' ? 'tr' : 'en';
+            this.lang.setLanguage(next);
+            if (this.onSettingChange) this.onSettingChange('language', next);
+            this.update(); // Refresh UI
+            // We need to refresh other UIs too, handled by main.js
+        };
+        row.appendChild(btn);
+        this.optionsList.appendChild(row);
     }
 
     addToggle(label, key) {

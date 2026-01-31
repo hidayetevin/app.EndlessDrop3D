@@ -1,7 +1,8 @@
 export class GameOver {
-    constructor(onRestart, onMenu) {
+    constructor(onRestart, onMenu, language) {
         this.onRestart = onRestart;
         this.onMenu = onMenu;
+        this.lang = language;
         this.container = null;
     }
 
@@ -31,7 +32,7 @@ export class GameOver {
 
         // Game Over Title
         const title = document.createElement('h1');
-        title.textContent = 'GAME OVER';
+        title.textContent = this.lang.get('GAME_OVER');
         title.style.cssText = `
             color: #ff4444;
             font-size: var(--font-size-h1, 56px);
@@ -91,7 +92,7 @@ export class GameOver {
 
         // Restart Button
         const restartBtn = document.createElement('button');
-        restartBtn.textContent = 'RESTART';
+        restartBtn.textContent = this.lang.get('RESTART');
         restartBtn.style.cssText = `
             padding: var(--btn-padding, 15px 50px);
             font-size: var(--btn-font-size, 28px);
@@ -116,7 +117,7 @@ export class GameOver {
 
         // Menu Button
         const menuBtn = document.createElement('button');
-        menuBtn.textContent = 'MENU';
+        menuBtn.textContent = this.lang.get('MAIN_MENU');
         menuBtn.style.cssText = `
             padding: clamp(10px, 2.5vw, 12px) clamp(30px, 5vw, 40px);
             font-size: var(--font-size-small, 20px);
@@ -143,19 +144,19 @@ export class GameOver {
 
     updateStats(score, highScore, gems, maxCombo) {
         if (this.scoreLabel) {
-            this.scoreLabel.textContent = `Score: ${score}`;
+            this.scoreLabel.textContent = `${this.lang.get('SCORE')}: ${score}`;
         }
         if (this.highScoreLabel) {
             const isNewRecord = score > highScore;
             this.highScoreLabel.textContent = isNewRecord ?
                 `🎉 NEW HIGH SCORE: ${score}` :
-                `High Score: ${highScore}`;
+                `${this.lang.get('HIGH_SCORE')}: ${highScore}`;
         }
         if (this.gemsLabel) {
-            this.gemsLabel.textContent = `💎 Gems: ${gems}`;
+            this.gemsLabel.textContent = `💎 ${this.lang.get('TOTAL_GEMS')}: ${gems}`;
         }
         if (this.comboLabel) {
-            this.comboLabel.textContent = `Max Combo: ${maxCombo}`;
+            this.comboLabel.textContent = `${this.lang.get('BEST_COMBO')}: ${maxCombo}`;
         }
     }
 
@@ -165,3 +166,4 @@ export class GameOver {
         }
     }
 }
+
