@@ -131,6 +131,14 @@ class Game {
       console.log('✨ Bonus collected: ' + result.bonusType);
       this.bonusSystem.collectBonus(result.bonusType);
     }
+    else if (result.type === 'miss') {
+      // ⚠️ MISSED A RING - GAME OVER!
+      console.log('❌ MISSED RING - Score: ' + this.gameState.score);
+      this.audio.playCrash();
+      this.haptic.error();
+      this.gameState.gameOver();
+      this.doGameOver();
+    }
     else if (result.type === 'collision') {
       // Check shield
       if (this.bonusSystem.useShield()) {

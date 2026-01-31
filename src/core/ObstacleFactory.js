@@ -71,6 +71,12 @@ export class ObstacleFactory {
 
     returnToPool(ring) {
         ring.visible = false;
+
+        // Reset userData for next use
+        ring.userData.passed = false;
+        ring.userData.isPerfect = false;
+        ring.userData.missed = false;
+
         const index = this.activeObstacles.indexOf(ring);
         if (index > -1) {
             this.activeObstacles.splice(index, 1);

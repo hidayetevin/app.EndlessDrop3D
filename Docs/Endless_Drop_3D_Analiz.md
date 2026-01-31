@@ -1,4 +1,4 @@
-# Endless Drop 3D – Analiz & Tasarım Dokümanı (v0.1)
+# Endless Drop 3D – Analiz & Tasarım Dokümanı (v0.2)
 
 ## 1. Platform & Teknoloji
 - Android + iOS
@@ -13,9 +13,10 @@
 - Sonsuz düşüş
 - Tek parmak kontrol
 - 30–90 sn oturum süresi
+- Skill-based gameplay (Zorunlu halka geçişi)
 
 ## 3. Core Gameplay Loop
-Start → Tema Seçimi → Countdown → Düşüş & Kaçınma → Hız Artışı → Çarpma → Game Over → Reklam → Restart
+Start → Countdown → **Zorunlu Halka Geçişi** → Hız Artışı → Miss/Çarpma → Game Over → Reklam → Restart
 
 ## 4. Kontrol
 - Varsayılan: Swipe
@@ -29,6 +30,9 @@ Start → Tema Seçimi → Countdown → Düşüş & Kaçınma → Hız Artış�
 
 ## 6. Engeller
 - v1.0: Sabit halkalar
+  - Boyut: 1.5 radius (küçültüldü)
+  - X pozisyon: -2 ~ +2 (rastgele)
+  - **Zorunlu geçiş:** Kaçırılırsa GAME OVER
 - v1.1+: Dönen, kapanan, kırılabilir
 
 ## 7. Bonus Sistemi
@@ -79,3 +83,64 @@ core/
 - FPS düşüşü → Instancing
 - Reklam lag → Scene pause
 - iOS limit → Düşük texture
+
+---
+
+## 14. Versiyon Geçmişi
+
+### v0.2 (2026-01-31)
+
+#### 🎨 İkon ve Branding
+- **App İkonu:** Neon cyberpunk temalı profesyonel ikon tasarlandı
+- **PWA Desteği:** manifest.json eklendi
+- **Apple Touch Icon:** iOS desteği eklendi
+- **Dosyalar:** `public/icon.png`, `public/manifest.json`
+
+#### 🎮 Halka Güncellemeleri
+- **Boyut Değişikliği:**
+  - Dış radius: 3.0 → **1.5** (-50%)
+  - Kalınlık: 0.3 → **0.2** (-33%)
+  
+- **X Pozisyon Varyasyonu:**
+  - Önceki: Sabit (X = 0)
+  - Yeni: **-2 ~ +2** rastgele
+  - Her oyun farklı deneyim
+
+- **Çarpışma Sistemi Düzeltildi:**
+  - Ring merkezine göre doğru mesafe hesaplaması
+  - Perfect pass algılaması düzeltildi
+  - Collision radii güncellendi (1.2/1.7)
+
+#### ⚠️ Miss Detection Sistemi (ZORUNLU GEÇİŞ)
+- **Yeni Kural:** Halkalardan geçmek artık **ZORUNLU**
+- **Miss Algılama:**
+  - Halka oyuncunun 1 birim üstüne çıktığında kontrol
+  - Geçilmemişse → **GAME OVER**
+  - Shield bile MISS'i engelleyemez
+
+- **Puanlama:**
+  - Normal Pass: +1 puan
+  - Perfect Pass: +1 puan + Combo
+  - Miss: GAME OVER
+  - Collision: GAME OVER (Shield ile kurtulma var)
+
+#### 📝 Teknik Değişiklikler
+- `CollisionSystem.js`: Miss detection + improved distance calculation
+- `ObstacleFactory.js`: Ring size + random X position + userData reset
+- `main.js`: Miss handler + game over logic
+- `index.html`: Icon integration + PWA manifest
+
+#### 📚 Dokümanlar
+- `docs/Icon_Integration_Guide.md` - İkon kurulum rehberi
+- `docs/Ring_Updates_Changelog.md` - Halka değişiklikleri
+- `docs/Miss_System_Changelog.md` - Miss sistem detayları
+- `ICON_README.md` - İkon özeti
+
+### v0.1 (Initial)
+- Temel oyun mekaniği
+- 3D scene setup
+- Player controls
+- Obstacle spawning
+- Collision detection
+- Theme system
+- UI components
