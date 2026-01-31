@@ -2,7 +2,8 @@ import {
     AdMob,
     BannerAdPosition,
     BannerAdSize,
-    RewardAdPluginEvents
+    RewardAdPluginEvents,
+    InterstitialAdPluginEvents
 } from '@capacitor-community/admob';
 
 export class AdManager {
@@ -13,6 +14,8 @@ export class AdManager {
         this.rewardedId = 'ca-app-pub-4190858087915294/9963881541';
 
         this.isInitialized = false;
+        this.interstitialReady = false;
+        this.rewardedReady = false;
     }
 
     async initialize() {
@@ -24,9 +27,59 @@ export class AdManager {
             });
             this.isInitialized = true;
             console.log('AdMob initialized');
+
             this.showBanner();
+
+            // Preload ads
+            this.prepareInterstitial();
+            this.prepareRewarded();
+
+            this.setupListeners();
         } catch (e) {
             console.error('AdMob initialization failed', e);
+        }
+    }
+
+    setupListeners() {
+        // Prepare next ads when current ones are dismissed
+        AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+            console.log('Interstitial dismissed, preparing next one...');
+            this.interstitialReady = false;
+            setTimeout(() => this.prepareInterstitial(), 2000);
+        });
+
+        AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+            console.log('Rewarded ad dismissed, preparing next one...');
+            this.rewardedReady = false;
+            setTimeout(() => this.prepareRewarded(), 2000);
+        });
+    }
+
+    async prepareInterstitial() {
+        if (!this.isInitialized) return;
+        try {
+            await AdMob.prepareInterstitial({
+                adId: this.interstitialId,
+            });
+            this.interstitialReady = true;
+            console.log('Interstitial ad ready');
+        } catch (e) {
+            console.error('Failed to prepare interstitial', e);
+            this.interstitialReady = false;
+        }
+    }
+
+    async prepareRewarded() {
+        if (!this.isInitialized) return;
+        try {
+            await AdMob.prepareRewardVideoAd({
+                adId: this.rewardedId,
+            });
+            this.rewardedReady = true;
+            console.log('Rewarded ad ready');
+        } catch (e) {
+            console.error('Failed to prepare rewarded ad', e);
+            this.rewardedReady = false;
         }
     }
 
@@ -55,40 +108,43 @@ export class AdManager {
     async showInterstitial() {
         if (!this.isInitialized) return;
 
+        if (!this.interstitialReady) {
+            console.warn('Interstitial not ready, preparing...');
+            this.prepareInterstitial();
+            return;
+        }
+
         try {
-            await AdMob.prepareInterstitial({
-                adId: this.interstitialId,
-            });
             await AdMob.showInterstitial();
         } catch (e) {
             console.error('Failed to show interstitial', e);
+            this.prepareInterstitial();
         }
     }
 
     async showRewarded(onComplete) {
         if (!this.isInitialized) return;
 
-        try {
-            await AdMob.prepareRewardVideoAd({
-                adId: this.rewardedId,
-            });
+        if (!this.rewardedReady) {
+            console.warn('Rewarded ad not ready, preparing...');
+            this.prepareRewarded();
+            if (onComplete) onComplete(false);
+            return;
+        }
 
-            // Listen for reward
+        try {
+            // Listen for reward (specific to this call)
             const rewardListener = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
                 console.log('Reward received:', reward);
                 if (onComplete) onComplete(true);
                 rewardListener.remove();
             });
 
-            // Handle dismissal without reward
-            const dismissListener = await AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
-                dismissListener.remove();
-            });
-
             await AdMob.showRewardVideoAd();
         } catch (e) {
             console.error('Failed to show rewarded ad', e);
             if (onComplete) onComplete(false);
+            this.prepareRewarded();
         }
     }
 }
