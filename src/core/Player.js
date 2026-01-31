@@ -23,7 +23,7 @@ export class Player {
         this.lastTouchX = 0;
         this.isDragging = false;
         this.sensitivity = 0.015; // Setup for relative sensitivity
-        this.tiltSensitivity = 0.15;
+        this.tiltSensitivity = 2.0;
         this.useTilt = false;
 
         this.setupInput();
@@ -38,7 +38,7 @@ export class Player {
                 const tiltX = e.gamma;
                 // Add some deadzone and smooth movement
                 if (Math.abs(tiltX) > 2) {
-                    this.moveHorizontal(tiltX * this.tiltSensitivity * 0.1);
+                    this.moveHorizontal(tiltX * this.tiltSensitivity);
                 }
             }
         });
@@ -84,7 +84,8 @@ export class Player {
         this.mesh.position.x += deltaX * this.sensitivity;
 
         // Clamp position to boundaries (e.g., tube width)
-        this.mesh.position.x = Math.max(-4, Math.min(4, this.mesh.position.x));
+        // Reduced to 2.5 to keep ball completely in view
+        this.mesh.position.x = Math.max(-2.5, Math.min(2.5, this.mesh.position.x));
     }
 
     update(dt) {

@@ -95,8 +95,73 @@ class Game {
       () => this.quitToMenu()
     );
 
+    this.createOverlays();
     this.menu.show(); // Show menu on startup
     this.gameLoop.start(); // Start rendering loop
+  }
+
+  createOverlays() {
+    // Countdown Overlay
+    this.countdownOverlay = document.createElement('div');
+    this.countdownOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.2);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1500;
+      pointer-events: none;
+    `;
+    this.countdownText = document.createElement('div');
+    this.countdownText.style.cssText = `
+      color: white;
+      font-size: 150px;
+      font-weight: bold;
+      text-shadow: 0 0 30px rgba(0,217,255,0.5);
+      font-family: Arial, sans-serif;
+    `;
+    this.countdownOverlay.appendChild(this.countdownText);
+    document.body.appendChild(this.countdownOverlay);
+
+    // Tap to Start Overlay
+    this.tapOverlay = document.createElement('div');
+    this.tapOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1600;
+      cursor: pointer;
+    `;
+    this.tapTextElement = document.createElement('div');
+    this.tapTextElement.textContent = this.lang.get('TAP_TO_START');
+    this.tapTextElement.style.cssText = `
+      color: white;
+      font-size: var(--font-size-h2, 40px);
+      font-weight: bold;
+      text-shadow: 0 0 20px rgba(0,217,255,0.8);
+      font-family: Arial, sans-serif;
+      animation: pulse 1.5s infinite;
+      text-align: center;
+      padding: 20px;
+    `;
+    this.tapOverlay.appendChild(this.tapTextElement);
+    this.tapOverlay.onclick = () => {
+      this.tapOverlay.style.display = 'none';
+      this.startCountdown();
+    };
+    document.body.appendChild(this.tapOverlay);
   }
 
   pauseGame() {
@@ -169,6 +234,9 @@ class Game {
       this.gameOverScreen.container.remove();
       this.gameOverScreen.container = null;
     }
+    if (this.tapTextElement) {
+      this.tapTextElement.textContent = this.lang.get('TAP_TO_START');
+    }
   }
 
   applySkin(skinId) {
@@ -192,7 +260,8 @@ class Game {
     this.hud.show();
     this.audio.resume(); // Resume audio context for iOS
 
-    this.startCountdown();
+    // Show Tap to Start instead of countdown directly
+    this.tapOverlay.style.display = 'flex';
   }
 
   startCountdown() {

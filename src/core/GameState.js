@@ -78,7 +78,6 @@ export class GameState {
     }
 
     reset() {
-        this.state = 'PLAYING';
         this.score = 0;
         this.passedRings = 0;
         this.perfectCombo = 0;
