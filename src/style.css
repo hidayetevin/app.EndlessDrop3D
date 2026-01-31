@@ -116,3 +116,35 @@ body {
     padding-right: env(safe-area-inset-right);
   }
 }
+/* UI Components */
+.menu-btn {
+    padding: var(--btn-padding, 15px 40px);
+    font-size: var(--btn-font-size, 24px);
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 44px;
+    pointer-events: auto !important;
+}
+
+.menu-btn.primary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.menu-btn.secondary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.menu-btn:active {
+    transform: scale(0.95);
+}
+
+.menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}

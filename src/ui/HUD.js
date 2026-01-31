@@ -81,7 +81,74 @@ export class HUD {
         `;
         this.container.appendChild(this.shieldIcon);
 
+        // Pause Button
+        this.pauseBtn = document.createElement('div');
+        this.pauseBtn.innerHTML = '⏸️';
+        this.pauseBtn.style.cssText = `
+            position: absolute;
+            top: max(20px, env(safe-area-inset-top, 20px) + 10px);
+            left: max(20px, env(safe-area-inset-left, 20px) + 10px);
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            pointer-events: auto;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        `;
+        this.container.appendChild(this.pauseBtn);
+
+        // Pause Menu Container
+        this.pauseMenu = document.createElement('div');
+        this.pauseMenu.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+        `;
+
+        const title = document.createElement('h2');
+        title.textContent = 'PAUSED';
+        title.style.cssText = `
+            color: white;
+            font-size: 48px;
+            margin-bottom: 40px;
+            font-family: Arial, sans-serif;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        `;
+        this.pauseMenu.appendChild(title);
+
+        this.resumeBtn = document.createElement('button');
+        this.resumeBtn.textContent = 'RESUME';
+        this.resumeBtn.className = 'menu-btn primary';
+        this.resumeBtn.style.marginBottom = '20px';
+        this.pauseMenu.appendChild(this.resumeBtn);
+
+        this.menuBtn = document.createElement('button');
+        this.menuBtn.textContent = 'MAIN MENU';
+        this.menuBtn.className = 'menu-btn secondary';
+        this.pauseMenu.appendChild(this.menuBtn);
+
+        document.body.appendChild(this.pauseMenu);
         document.body.appendChild(this.container);
+    }
+
+    setPauseCallbacks(onPause, onResume, onMenu) {
+        this.pauseBtn.onclick = onPause;
+        this.resumeBtn.onclick = onResume;
+        this.menuBtn.onclick = onMenu;
+    }
+
+    showPauseMenu(visible) {
+        this.pauseMenu.style.display = visible ? 'flex' : 'none';
+        this.pauseBtn.style.display = visible ? 'none' : 'block';
     }
 
     updateScore(score) {

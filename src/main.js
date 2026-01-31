@@ -59,8 +59,34 @@ class Game {
     this.themeManager.reset(); // Apply initial biome
 
     this.hud.create();
+    this.hud.setPauseCallbacks(
+      () => this.pauseGame(),
+      () => this.resumeGame(),
+      () => this.quitToMenu()
+    );
+
     this.menu.show(); // Show menu on startup
     this.gameLoop.start(); // Start rendering loop
+  }
+
+  pauseGame() {
+    this.gameState.pause();
+    this.hud.showPauseMenu(true);
+    this.audio.pause();
+  }
+
+  resumeGame() {
+    this.gameState.resume();
+    this.hud.showPauseMenu(false);
+    this.audio.resume();
+  }
+
+  quitToMenu() {
+    this.gameState.state = 'MENU';
+    this.hud.showPauseMenu(false);
+    this.hud.hide();
+    this.menu.show();
+    this.audio.stop(); // Stop game music
   }
 
   startGame() {
@@ -187,6 +213,11 @@ class Game {
   }
 
   update(dt) {
+    // Always render if world is visible
+    if (this.gameState.state !== 'MENU') {
+      this.sceneManager.render(this.cameraManager.camera);
+    }
+
     if (this.gameState.state !== 'PLAYING') return;
 
     // Apply time scale for slow motion
@@ -231,9 +262,6 @@ class Game {
     this.hud.updateScore(state.score);
     this.hud.updateGems(state.gems);
     this.hud.showShield(this.bonusSystem.activeEffects.shield);
-
-    // Render
-    this.sceneManager.render(this.cameraManager.camera);
   }
 }
 

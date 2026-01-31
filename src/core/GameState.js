@@ -65,6 +65,18 @@ export class GameState {
         this.saveHighScore();
     }
 
+    pause() {
+        if (this.state === 'PLAYING') {
+            this.state = 'PAUSED';
+        }
+    }
+
+    resume() {
+        if (this.state === 'PAUSED') {
+            this.state = 'PLAYING';
+        }
+    }
+
     reset() {
         this.state = 'PLAYING';
         this.score = 0;
