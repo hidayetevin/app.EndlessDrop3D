@@ -57,30 +57,46 @@ export class AdManager {
 
     async prepareInterstitial() {
         if (!this.isInitialized) return;
+
         try {
+            this.interstitialReady = false;
+            console.log('📺 Interstitial hazırlanıyor...');
             await AdMob.prepareInterstitial({
                 adId: this.interstitialId,
             });
             this.interstitialReady = true;
-            console.log('Interstitial ad ready');
+            console.log('✅ Interstitial hazır!');
         } catch (e) {
-            console.error('Failed to prepare interstitial', e);
+            console.error('❌ Interstitial hazırlanamadı, 5sn sonra tekrar denenecek', e);
             this.interstitialReady = false;
+            setTimeout(() => this.prepareInterstitial(), 5000); // Hata durumunda tekrar dene
         }
     }
 
     async prepareRewarded() {
         if (!this.isInitialized) return;
+
         try {
+            this.rewardedReady = false;
+            console.log('🎁 Ödüllü reklam hazırlanıyor...');
             await AdMob.prepareRewardVideoAd({
                 adId: this.rewardedId,
             });
             this.rewardedReady = true;
-            console.log('Rewarded ad ready');
+            console.log('✅ Ödüllü reklam hazır!');
         } catch (e) {
-            console.error('Failed to prepare rewarded ad', e);
+            console.error('❌ Ödüllü reklam hazırlanamadı, 5sn sonra tekrar denenecek', e);
             this.rewardedReady = false;
+            setTimeout(() => this.prepareRewarded(), 5000); // Hata durumunda tekrar dene
         }
+    }
+
+    isRewardedReady() {
+        return this.isInitialized && this.rewardedReady;
+    }
+
+    isInterstitialReady() {
+        return this.isInitialized && this.interstitialReady;
     }
 
     async showBanner() {
@@ -95,8 +111,9 @@ export class AdManager {
 
         try {
             await AdMob.showBanner(options);
+            console.log('📊 Banner gösteriliyor');
         } catch (e) {
-            console.error('Failed to show banner', e);
+            console.error('❌ Banner gösterilemedi', e);
         }
     }
 
@@ -109,40 +126,45 @@ export class AdManager {
         if (!this.isInitialized) return;
 
         if (!this.interstitialReady) {
-            console.warn('Interstitial not ready, preparing...');
+            console.warn('⚠️ Interstitial henüz hazır değil, yükleme tetiklendi.');
             this.prepareInterstitial();
-            return;
+            return false;
         }
 
         try {
             await AdMob.showInterstitial();
+            return true;
         } catch (e) {
-            console.error('Failed to show interstitial', e);
+            console.error('❌ Interstitial gösterilirken hata oluştu', e);
             this.prepareInterstitial();
+            return false;
         }
     }
 
     async showRewarded(onComplete) {
-        if (!this.isInitialized) return;
+        if (!this.isInitialized) {
+            if (onComplete) onComplete(false);
+            return;
+        }
 
         if (!this.rewardedReady) {
-            console.warn('Rewarded ad not ready, preparing...');
+            console.warn('⚠️ Ödüllü reklam hazır değil.');
             this.prepareRewarded();
             if (onComplete) onComplete(false);
             return;
         }
 
         try {
-            // Listen for reward (specific to this call)
+            // Ödül dinleyicisi (her gösterim için özel)
             const rewardListener = await AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
-                console.log('Reward received:', reward);
+                console.log('💰 Ödül kazanıldı:', reward);
                 if (onComplete) onComplete(true);
                 rewardListener.remove();
             });
 
             await AdMob.showRewardVideoAd();
         } catch (e) {
-            console.error('Failed to show rewarded ad', e);
+            console.error('❌ Ödüllü reklam gösterilemedi', e);
             if (onComplete) onComplete(false);
             this.prepareRewarded();
         }

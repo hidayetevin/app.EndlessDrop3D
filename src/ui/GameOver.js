@@ -81,6 +81,15 @@ export class GameOver {
             animation: pulse 1.5s infinite;
         `;
         this.rewardBtn.onclick = () => {
+            if (window.game && window.game.ads && !window.game.ads.isRewardedReady()) {
+                this.rewardBtn.textContent = 'LOADING...';
+                this.rewardBtn.style.background = '#666';
+                setTimeout(() => {
+                    this.rewardBtn.textContent = this.lang.get('EARN_2X');
+                    this.rewardBtn.style.background = '#ffff00';
+                }, 2000);
+                return;
+            }
             this.onReward();
             this.rewardBtn.style.display = 'none';
         };
