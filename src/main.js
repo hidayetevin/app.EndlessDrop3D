@@ -118,10 +118,10 @@ class Game {
       this.audio.setSoundEnabled(this.storage.data.settings.soundEnabled);
     }
 
-    // Start background music (lazy load)
-    if (this.storage.data.settings.musicEnabled) {
-      this.audio.startBackgroundMusic('SKY');
-    }
+    // Start background music (MOVED to startGame)
+    // if (this.storage.data.settings.musicEnabled) {
+    //   this.audio.startBackgroundMusic('SKY');
+    // }
 
     this.gameLoop.start(); // Start rendering loop
   }
@@ -206,6 +206,7 @@ class Game {
   }
 
   quitToMenu() {
+    this.audio.pause(); // 🛑 Stop music
     this.gameState.state = 'MENU';
     this.hud.showPauseMenu(false);
     this.hud.hide();
@@ -327,6 +328,11 @@ class Game {
   }
 
   startCountdown() {
+    // Start background music here (after user interaction)
+    if (this.storage.data.settings.musicEnabled) {
+      this.audio.startBackgroundMusic('SKY');
+    }
+
     this.countdownOverlay.style.display = 'flex';
     let count = 3;
 
@@ -431,6 +437,7 @@ class Game {
 
 
   doGameOver() {
+    this.audio.pause(); // 🛑 Stop music
     console.log('💥 GAME OVER - Score: ' + this.gameState.score);
     this.gameState.gameOver();
 
@@ -545,6 +552,7 @@ class Game {
   }
 
   showMenu() {
+    this.audio.pause(); // 🛑 Stop music (just in case)
     if (this.gameState.state === 'GAME_OVER') {
       this.ads.showInterstitial();
     }
