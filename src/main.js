@@ -123,6 +123,19 @@ class Game {
     //   this.audio.startBackgroundMusic('SKY');
     // }
 
+    // Handle background/foreground state
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        // App went to background
+        if (this.gameState.state === 'PLAYING' || this.gameState.state === 'COUNTDOWN') {
+          this.pauseGame();
+        } else {
+          // Just mute audio if in menu/gameover
+          this.audio.pause();
+        }
+      }
+    });
+
     this.gameLoop.start(); // Start rendering loop
   }
 
