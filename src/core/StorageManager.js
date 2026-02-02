@@ -18,6 +18,8 @@ export class StorageManager {
                 hapticEnabled: true,
                 tiltEnabled: false,
                 tiltSensitivity: 1.2,
+                musicVolume: 0.5, // 0.0 - 1.0
+                soundVolume: 0.5, // 0.0 - 1.0
                 language: 'en'
             },
             dailyTasks: {

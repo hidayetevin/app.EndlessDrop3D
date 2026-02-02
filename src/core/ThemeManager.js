@@ -7,10 +7,16 @@ export class ThemeManager {
         this.currentTheme = 'SKY';
         this.currentBiome = 0;
 
+        // Skybox system
+        this.textureLoader = new THREE.TextureLoader();
+        this.skyboxCache = {}; // Cache loaded textures
+        this.useSkybox = true; // Toggle skybox (fallback to solid color)
+
         // Biome definitions (changes with distance)
         this.biomes = [
             {
                 name: 'SKY',
+                skyboxPath: 'assets/skybox/sky.png',
                 backgroundColor: 0x87CEEB,
                 ambientColor: 0xffffff,
                 ambientIntensity: 0.6,
@@ -22,6 +28,7 @@ export class ThemeManager {
             },
             {
                 name: 'SPACE',
+                skyboxPath: 'assets/skybox/space.png',
                 backgroundColor: 0x0a0a2e,
                 ambientColor: 0x6666ff,
                 ambientIntensity: 0.4,
@@ -33,6 +40,7 @@ export class ThemeManager {
             },
             {
                 name: 'VOID',
+                skyboxPath: 'assets/skybox/void.png',
                 backgroundColor: 0x1a0000,
                 ambientColor: 0xff3333,
                 ambientIntensity: 0.3,
@@ -79,8 +87,22 @@ export class ThemeManager {
     }
 
     applyBiome(biome) {
-        // Update background
-        this.scene.background = new THREE.Color(biome.backgroundColor);
+        // Try to load skybox texture (async, non-blocking)
+        if (this.useSkybox && biome.skyboxPath) {
+            this.loadSkyboxTexture(biome.skyboxPath)
+                .then((texture) => {
+                    this.scene.background = texture;
+                    console.log(`🌌 Skybox loaded: ${biome.name}`);
+                })
+                .catch(() => {
+                    // Fallback to solid color
+                    this.scene.background = new THREE.Color(biome.backgroundColor);
+                    console.warn(`⚠️ Skybox failed, using solid color: ${biome.name}`);
+                });
+        } else {
+            // No skybox, use solid color
+            this.scene.background = new THREE.Color(biome.backgroundColor);
+        }
 
         // Update fog
         this.scene.fog = new THREE.Fog(biome.fogColor, biome.fogNear, biome.fogFar);
@@ -102,6 +124,41 @@ export class ThemeManager {
         }
 
         console.log(`🌍 Biome changed to: ${biome.name}`);
+    }
+
+    /**
+     * Load skybox texture (lazy loading with cache)
+     * @param {string} path - Path to texture file
+     * @returns {Promise<THREE.Texture>}
+     */
+    loadSkyboxTexture(path) {
+        // Check cache first
+        if (this.skyboxCache[path]) {
+            console.log(`🌌 Using cached skybox: ${path}`);
+            return Promise.resolve(this.skyboxCache[path]);
+        }
+
+        // Load texture
+        return new Promise((resolve, reject) => {
+            this.textureLoader.load(
+                path,
+                (texture) => {
+                    // Configure for equirectangular skybox
+                    texture.mapping = THREE.EquirectangularReflectionMapping;
+                    texture.colorSpace = THREE.SRGBColorSpace;
+
+                    // Cache it
+                    this.skyboxCache[path] = texture;
+
+                    resolve(texture);
+                },
+                undefined, // onProgress (optional)
+                (error) => {
+                    console.error(`❌ Failed to load skybox: ${path}`, error);
+                    reject(error);
+                }
+            );
+        });
     }
 
     applyTheme(themeName) {

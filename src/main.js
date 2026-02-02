@@ -110,6 +110,14 @@ class Game {
     this.createOverlays();
     this.menu.show(); // Show menu on startup
 
+    // Apply initial audio settings
+    if (this.storage.data.settings.musicVolume !== undefined) {
+      this.audio.setMusicVolume(this.storage.data.settings.musicVolume);
+    }
+    if (this.storage.data.settings.soundEnabled !== undefined) {
+      this.audio.setSoundEnabled(this.storage.data.settings.soundEnabled);
+    }
+
     // Start background music (lazy load)
     if (this.storage.data.settings.musicEnabled) {
       this.audio.startBackgroundMusic('SKY');
@@ -232,11 +240,25 @@ class Game {
     } else if (key === 'tiltSensitivity') {
       this.player.tiltSensitivity = val;
     } else if (key === 'musicEnabled') {
-      if (val) this.audio.resume(); else this.audio.pause();
+      if (val) {
+        this.audio.setMusicEnabled(true);
+        this.audio.resume();
+      } else {
+        this.audio.setMusicEnabled(false);
+        this.audio.pause();
+      }
+    } else if (key === 'musicVolume') {
+      this.audio.setMusicVolume(val);
+    } else if (key === 'soundEnabled') {
+      this.audio.setSoundEnabled(val);
+    } else if (key === 'soundVolume') {
+      // SFX uses audioContext gain, we'd need to add this feature
+      // For now, just log
+      console.log(`Sound volume set to: ${Math.round(val * 100)}%`);
     } else if (key === 'language') {
       this.refreshAllUI();
     }
-    // Haptics and Sound FX are checked inside Manager classes usually
+    // Haptics checked inside HapticManager
   }
 
   refreshAllUI() {

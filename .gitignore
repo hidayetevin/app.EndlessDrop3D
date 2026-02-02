@@ -28,3 +28,9 @@ assets/music/*.mp3
 assets/music/*.ogg
 assets/music/*.wav
 !assets/music/README.md
+
+# Skybox textures (large files, not in version control)
+assets/skybox/*.jpg
+assets/skybox/*.png
+assets/skybox/*.hdr
+!assets/skybox/README.md

@@ -62,9 +62,20 @@ export class SettingsUI {
 
     update() {
         this.optionsList.innerHTML = '';
-        // Settings items
+
+        // Music settings
         this.addToggle(this.lang.get('MUSIC'), 'musicEnabled');
+        if (this.storage.data.settings.musicEnabled) {
+            this.addVolumeSlider(this.lang.get('MUSIC_VOLUME'), 'musicVolume');
+        }
+
+        // Sound FX settings
         this.addToggle(this.lang.get('SOUND_FX'), 'soundEnabled');
+        if (this.storage.data.settings.soundEnabled) {
+            this.addVolumeSlider(this.lang.get('SOUND_VOLUME'), 'soundVolume');
+        }
+
+        // Other settings
         this.addToggle(this.lang.get('HAPTICS'), 'hapticEnabled');
         this.addToggle(this.lang.get('TILT_CONTROL'), 'tiltEnabled', (val) => this.update());
 
@@ -73,6 +84,54 @@ export class SettingsUI {
         }
 
         this.addLanguageSelector();
+    }
+
+    /**
+     * Add volume slider (0-1 range, displayed as %)
+     */
+    addVolumeSlider(label, key) {
+        const row = document.createElement('div');
+        row.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-left: 20px;
+        `;
+
+        const header = document.createElement('div');
+        header.style.cssText = `display: flex; justify-content: space-between; color: white;`;
+        const name = document.createElement('div');
+        name.textContent = label;
+        name.style.fontSize = '16px';
+        header.appendChild(name);
+
+        const valueDisplay = document.createElement('div');
+        const currentValue = this.storage.data.settings[key] || 0.5;
+        valueDisplay.textContent = Math.round(currentValue * 100) + '%';
+        valueDisplay.style.fontWeight = 'bold';
+        header.appendChild(valueDisplay);
+        row.appendChild(header);
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = 0;
+        slider.max = 1;
+        slider.step = 0.01;
+        slider.value = currentValue;
+        slider.style.width = '100%';
+        slider.oninput = (e) => {
+            const val = parseFloat(e.target.value);
+            valueDisplay.textContent = Math.round(val * 100) + '%';
+            this.storage.updateSetting(key, val);
+            if (this.onSettingChange) this.onSettingChange(key, val);
+        };
+        row.appendChild(slider);
+
+        this.optionsList.appendChild(row);
     }
 
     addSlider(label, key, min, max, step) {
