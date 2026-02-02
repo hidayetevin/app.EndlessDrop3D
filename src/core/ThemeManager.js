@@ -71,9 +71,9 @@ export class ThemeManager {
     updateBiome(score) {
         let newBiome = 0;
 
-        if (score > 1000) {
+        if (score > 150) {
             newBiome = 2; // VOID
-        } else if (score > 500) {
+        } else if (score > 50) {
             newBiome = 1; // SPACE
         }
 
