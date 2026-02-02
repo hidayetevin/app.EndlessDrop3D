@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export class AudioManager {
     constructor(camera) {
         // THREE.js Audio System
@@ -12,7 +14,7 @@ export class AudioManager {
         this.sounds = {};
         this.musicEnabled = true;
         this.soundEnabled = true;
-        this.musicVolume = 0.3; // Lower volume for background music
+        this.musicVolume = 0.3; // Default music volume
 
         // SFX Audio Context (kept for backward compatibility)
         this.audioContext = null;
@@ -30,7 +32,6 @@ export class AudioManager {
         // Initialize THREE.js Audio System for background music
         if (this.camera) {
             try {
-                const THREE = window.THREE || require('three');
                 this.listener = new THREE.AudioListener();
                 this.camera.add(this.listener);
                 this.loader = new THREE.AudioLoader();
@@ -99,13 +100,28 @@ export class AudioManager {
         this.soundEnabled = enabled;
     }
 
-    // Resume audio context (required for iOS)
+    // Resume audio context (required for mobile/browsers)
     resume() {
+        console.log('🔈 Attempting to resume audio context...');
+
+        // Resume manual AudioContext
         if (this.audioContext && this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+            this.audioContext.resume().then(() => {
+                console.log('✅ Manual AudioContext resumed');
+            });
         }
-        // Resume background music if it was playing
-        if (this.musicEnabled && this.bgMusic && !this.bgMusic.isPlaying) {
+
+        // Resume Three.js AudioListener context
+        if (this.listener && this.listener.context && this.listener.context.state === 'suspended') {
+            this.listener.context.resume().then(() => {
+                console.log('✅ THREE.AudioListener context resumed');
+                // Play music if it was waiting
+                if (this.musicEnabled && this.bgMusic && !this.bgMusic.isPlaying) {
+                    this.bgMusic.play();
+                }
+            });
+        } else if (this.musicEnabled && this.bgMusic && !this.bgMusic.isPlaying) {
+            // Context might already be running but music not started
             this.bgMusic.play();
         }
     }
@@ -142,12 +158,13 @@ export class AudioManager {
         }
 
         return new Promise((resolve, reject) => {
+            // Use absolute-like path from root for production builds
             const path = `assets/music/${biomeName.toLowerCase()}.mp3`;
+            console.log(`🎵 Loading music asset: ${path}`);
 
             this.loader.load(
                 path,
                 (buffer) => {
-                    const THREE = window.THREE || require('three');
                     const music = new THREE.Audio(this.listener);
                     music.setBuffer(buffer);
                     music.setLoop(true);
@@ -190,9 +207,15 @@ export class AudioManager {
 
                 this.bgMusic = music;
                 this.currentBiome = biomeName;
-                this.bgMusic.play();
 
-                console.log(`🎵 Playing: ${biomeName}`);
+                // Force state check and play
+                if (this.listener && this.listener.context.state === 'running') {
+                    this.bgMusic.play();
+                } else {
+                    console.log('🔇 AudioContext is suspended, waiting for user interaction to play...');
+                }
+
+                console.log(`🎵 Music object ready for: ${biomeName}`);
             }
         } catch (error) {
             console.warn('Background music failed to start:', error);

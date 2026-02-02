@@ -132,6 +132,8 @@ export class ThemeManager {
      * @returns {Promise<THREE.Texture>}
      */
     loadSkyboxTexture(path) {
+        console.log(`🖼️ Attempting to load skybox: ${path}`);
+
         // Check cache first
         if (this.skyboxCache[path]) {
             console.log(`🌌 Using cached skybox: ${path}`);

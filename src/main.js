@@ -184,6 +184,9 @@ class Game {
     `;
     this.tapOverlay.appendChild(this.tapTextElement);
     this.tapOverlay.onclick = () => {
+      // 🔊 CRITICAL: Resume audio context on first real user interaction
+      if (this.audio) this.audio.resume();
+
       this.tapOverlay.style.display = 'none';
       this.startCountdown();
     };
