@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Audio files (large files, not in version control)
+assets/music/*.mp3
+assets/music/*.ogg
+assets/music/*.wav
+!assets/music/README.md

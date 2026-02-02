@@ -30,14 +30,22 @@ export class CollisionSystem {
                 // Check perfect pass (very center)
                 if (distanceFromCenter < this.perfectZoneRadius && !ring.userData.isPerfect) {
                     ring.userData.isPerfect = true;
-                    return { type: 'perfect', ring };
+                    return {
+                        type: 'perfect',
+                        ring,
+                        ringPosition: ring.position.clone() // For particle effects
+                    };
                 }
 
                 // Check if player is inside safe zone (passed)
                 if (distanceFromCenter < this.ringInnerRadius) {
                     if (!ring.userData.passed) {
                         ring.userData.passed = true;
-                        return { type: 'pass', ring };
+                        return {
+                            type: 'pass',
+                            ring,
+                            ringPosition: ring.position.clone()
+                        };
                     }
                 }
 

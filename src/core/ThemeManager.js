@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
 export class ThemeManager {
-    constructor(scene) {
+    constructor(scene, audioManager = null) {
         this.scene = scene;
+        this.audioManager = audioManager;
         this.currentTheme = 'SKY';
         this.currentBiome = 0;
 
@@ -93,6 +94,11 @@ export class ThemeManager {
         if (this.lights.directional) {
             this.lights.directional.color.setHex(biome.directionalColor);
             this.lights.directional.intensity = biome.directionalIntensity;
+        }
+
+        // Crossfade background music
+        if (this.audioManager && this.audioManager.crossfadeTo) {
+            this.audioManager.crossfadeTo(biome.name, 2.0);
         }
 
         console.log(`🌍 Biome changed to: ${biome.name}`);

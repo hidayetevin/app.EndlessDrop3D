@@ -22,6 +22,9 @@ import { DailyTaskUI } from './ui/DailyTaskUI.js';
 import { SettingsUI } from './ui/SettingsUI.js';
 import { LanguageManager } from './core/LanguageManager.js';
 import { AdManager } from './core/AdManager.js';
+import { ParticleManager } from './core/ParticleManager.js';
+import { TrailRenderer } from './core/TrailRenderer.js';
+
 
 class Game {
   constructor() {
@@ -32,17 +35,26 @@ class Game {
 
     this.sceneManager = new SceneManager();
     this.cameraManager = new CameraManager();
+
+    // AudioManager needs camera for THREE.AudioListener
+    this.audio = new AudioManager(this.cameraManager.camera);
+
     this.player = new Player(this.sceneManager.scene);
     this.obstacleFactory = new ObstacleFactory(this.sceneManager.scene);
     this.collisionSystem = new CollisionSystem();
     this.gameState = new GameState();
     this.bonusSystem = new BonusSystem(this.sceneManager.scene);
     this.difficultyManager = new DifficultyManager();
-    this.themeManager = new ThemeManager(this.sceneManager.scene);
+
+    // ThemeManager needs audioManager for background music
+    this.themeManager = new ThemeManager(this.sceneManager.scene, this.audio);
+
+    // Visual Effects Systems
+    this.particleManager = new ParticleManager(this.sceneManager.scene);
+    this.trailRenderer = new TrailRenderer(this.sceneManager.scene, this.player.mesh);
 
     // Core Systems
     this.dailyTasks = new DailyTaskManager(this.storage);
-    this.audio = new AudioManager();
     this.haptic = new HapticManager();
 
     // UI Components
@@ -97,6 +109,12 @@ class Game {
 
     this.createOverlays();
     this.menu.show(); // Show menu on startup
+
+    // Start background music (lazy load)
+    if (this.storage.data.settings.musicEnabled) {
+      this.audio.startBackgroundMusic('SKY');
+    }
+
     this.gameLoop.start(); // Start rendering loop
   }
 
@@ -255,6 +273,11 @@ class Game {
   applySkin(skinId) {
     const skinData = SkinConfig.skins[skinId];
     this.player.setSkin(skinData);
+
+    // Update trail color to match player skin
+    if (this.trailRenderer && skinData && skinData.color) {
+      this.trailRenderer.setColor(skinData.color);
+    }
   }
 
   startGame() {
@@ -321,6 +344,11 @@ class Game {
       // Feedback
       this.audio.playPerfect();
       this.haptic.medium();
+
+      // ✨ Particle burst effect
+      if (result.ringPosition) {
+        this.particleManager.createBurst(result.ringPosition, 30, 0x00d9ff, 2.0);
+      }
 
       // Update daily tasks
       this.dailyTasks.updateProgress('perfect', 1);
@@ -435,6 +463,12 @@ class Game {
         this.audio.playCoin();
         this.haptic.light();
         this.dailyTasks.updateProgress('gems', 1);
+
+        // ✨ Sparkle effect at gem position
+        if (item.item) {
+          this.particleManager.createSparkle(item.item.position, 15, 0xffd700);
+        }
+
         console.log('💎 Gem collected! Total: ' + this.gameState.gems);
       } else if (item.type === 'bonus') {
         this.bonusSystem.activateBonus(item.bonusType);
@@ -446,8 +480,14 @@ class Game {
 
     // Update Biome based on score
     if (this.themeManager.updateBiome(this.gameState.score)) {
-      // Biome changed - could trigger special effects
+      // Biome changed - trigger particle wave effect
+      const biome = this.themeManager.getCurrentBiome();
+      this.particleManager.createWave(biome.ambientColor, 'up');
     }
+
+    // Update Visual Effects
+    this.particleManager.update(scaledDt);
+    this.trailRenderer.update(scaledDt);
 
     // Update HUD
     const state = this.gameState.getState();
