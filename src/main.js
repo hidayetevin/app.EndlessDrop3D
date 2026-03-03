@@ -450,6 +450,7 @@ class Game {
 
 
   doGameOver() {
+    this.rewardedWatched = false; // Reset the flag
     this.audio.pause(); // 🛑 Stop music
     console.log('💥 GAME OVER - Score: ' + this.gameState.score);
     this.gameState.gameOver();
@@ -544,6 +545,7 @@ class Game {
   showRewardedAd() {
     this.ads.showRewarded((success) => {
       if (success) {
+        this.rewardedWatched = true; // Mark as watched
         console.log("Adding reward: " + this.gemsCollectedThisRun + " extra gems");
         this.storage.addGems(this.gemsCollectedThisRun);
         this.gameOverScreen.updateStats(
@@ -558,7 +560,9 @@ class Game {
 
   restartGame() {
     if (this.gameState.state === 'GAME_OVER') {
-      this.ads.showInterstitial();
+      if (!this.rewardedWatched) {
+        this.ads.showInterstitial();
+      }
     }
     // Clean up and restart
     this.startGame();
@@ -567,7 +571,9 @@ class Game {
   showMenu() {
     this.audio.pause(); // 🛑 Stop music (just in case)
     if (this.gameState.state === 'GAME_OVER') {
-      this.ads.showInterstitial();
+      if (!this.rewardedWatched) {
+        this.ads.showInterstitial();
+      }
     }
     this.hud.hide();
     this.menu.show();
