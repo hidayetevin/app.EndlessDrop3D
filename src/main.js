@@ -472,7 +472,7 @@ class Game {
     this.gameOverScreen.show(
       state.score,
       this.storage.getHighScore(),
-      this.storage.getTotalGems(),
+      this.gemsCollectedThisRun, // Show run gems instead of total
       state.maxCombo
     );
   }
@@ -504,8 +504,8 @@ class Game {
     const collected = this.bonusSystem.checkCollection(this.player.mesh.position);
     for (const item of collected) {
       if (item.type === 'gem') {
+        this.gemsCollectedThisRun++; // Track total gems in this run
         this.gameState.addGem();
-        this.gemsCollectedThisRun++;
         this.audio.playCoin();
         this.haptic.light();
         this.dailyTasks.updateProgress('gems', 1);
@@ -551,7 +551,7 @@ class Game {
         this.gameOverScreen.updateStats(
           this.gameState.score,
           this.storage.getHighScore(),
-          this.storage.getTotalGems(),
+          this.gemsCollectedThisRun, // Show updated run gems
           this.gameState.maxCombo
         );
       }

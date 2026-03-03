@@ -163,7 +163,7 @@ export class GameOver {
                 `${this.lang.get('HIGH_SCORE')}: ${highScore}`;
         }
         if (this.gemsLabel) {
-            this.gemsLabel.textContent = `💎 ${this.lang.get('TOTAL_GEMS')}: ${gems}`;
+            this.gemsLabel.textContent = `💎 ${this.lang.get('EARNED_GEMS')}: ${gems}`;
         }
         if (this.comboLabel) {
             this.comboLabel.textContent = `${this.lang.get('BEST_COMBO')}: ${maxCombo}`;
