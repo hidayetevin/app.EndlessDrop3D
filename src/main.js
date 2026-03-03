@@ -212,12 +212,21 @@ class Game {
     this.gameState.pause();
     this.hud.showPauseMenu(true);
     this.audio.pause();
+    // Pause countdown if in progress
+    if (this.countdownTimer) {
+      clearTimeout(this.countdownTimer);
+      this.countdownTimer = null;
+    }
   }
 
   resumeGame() {
     this.gameState.resume();
     this.hud.showPauseMenu(false);
     this.audio.resume();
+    // Resume countdown if it was paused during COUNTDOWN state
+    if (this.gameState.state === 'COUNTDOWN') {
+      this.resumeCountdown();
+    }
   }
 
   quitToMenu() {
@@ -226,9 +235,13 @@ class Game {
     this.hud.showPauseMenu(false);
     this.hud.hide();
 
-    // Hide overlays
+    // Hide overlays and clear pending timeouts
     if (this.tapOverlay) this.tapOverlay.style.display = 'none';
     if (this.countdownOverlay) this.countdownOverlay.style.display = 'none';
+    if (this.countdownTimer) {
+      clearTimeout(this.countdownTimer);
+      this.countdownTimer = null;
+    }
 
     this.menu.show(this.storage.getTotalGems());
     this.audio.stop(); // Stop game music
@@ -349,18 +362,24 @@ class Game {
     }
 
     this.countdownOverlay.style.display = 'flex';
-    let count = 3;
+    this.currentCount = 3; // Use class variable so we can resume it
+    this.resumeCountdown();
+  }
 
+  resumeCountdown() {
     const updateCount = () => {
-      if (count > 0) {
-        this.countdownText.textContent = count;
+      // If we left the countdown state (e.g. quit to menu) or paused, stop ticking
+      if (this.gameState.state === 'MENU' || this.gameState.state === 'PAUSED') return;
+
+      if (this.currentCount > 0) {
+        this.countdownText.textContent = this.currentCount;
         this.audio.playCoin();
-        count--;
-        setTimeout(updateCount, 1000);
+        this.currentCount--;
+        this.countdownTimer = setTimeout(updateCount, 1000);
       } else {
         this.countdownText.textContent = this.lang.get('GO');
         this.audio.playPerfect();
-        setTimeout(() => {
+        this.countdownTimer = setTimeout(() => {
           this.countdownOverlay.style.display = 'none';
           this.gameState.state = 'PLAYING';
           this.storage.incrementStat('totalGamesPlayed');
