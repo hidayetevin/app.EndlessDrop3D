@@ -43,36 +43,73 @@ export class GameOver {
         `;
         this.container.appendChild(title);
 
-        // Stats Container
         const statsContainer = document.createElement('div');
-        statsContainer.style.cssText = `
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            font-size: clamp(18px, 4.5vw, 24px);
-            font-weight: 600;
-            line-height: 1.6;
-            text-align: center;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            padding: var(--spacing-md, 20px);
-            border-radius: 20px;
-            margin-bottom: clamp(10px, 2vw, 15px);
-            max-width: 90vw;
-            width: 300px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        `;
+        statsContainer.className = 'game-over-stats';
 
         this.scoreLabel = document.createElement('div');
+        this.scoreLabel.className = 'stat-row';
         statsContainer.appendChild(this.scoreLabel);
+
         this.highScoreLabel = document.createElement('div');
+        this.highScoreLabel.className = 'stat-row';
         statsContainer.appendChild(this.highScoreLabel);
+
         this.gemsLabel = document.createElement('div');
+        this.gemsLabel.className = 'stat-row';
         statsContainer.appendChild(this.gemsLabel);
+
         this.comboLabel = document.createElement('div');
+        this.comboLabel.className = 'stat-row';
         statsContainer.appendChild(this.comboLabel);
+
         this.container.appendChild(statsContainer);
+
+        // Add dynamic CSS for the new stat rows formatting
+        const style = document.createElement('style');
+        style.textContent = `
+            .game-over-stats {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 20px;
+                padding: clamp(15px, 4vw, 25px);
+                margin-bottom: clamp(15px, 4vw, 25px);
+                max-width: 90vw;
+                width: 320px;
+                box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .stat-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: clamp(16px, 4vw, 22px);
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: rgba(255,255,255,0.8);
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                padding-bottom: 8px;
+            }
+            .stat-row:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .stat-value {
+                font-weight: 800;
+                color: #ffffff;
+                text-shadow: 0 0 10px rgba(255,255,255,0.5);
+                font-size: 1.1em;
+            }
+            .stat-highlight {
+                color: #00ff88;
+                text-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+            }
+        `;
+        document.head.appendChild(style);
 
         // 2X Earn Button (Visible first)
         this.rewardBtn = document.createElement('button');
@@ -154,19 +191,19 @@ export class GameOver {
 
     updateStats(score, highScore, gems, maxCombo) {
         if (this.scoreLabel) {
-            this.scoreLabel.textContent = `${this.lang.get('SCORE')}: ${score}`;
+            this.scoreLabel.innerHTML = `<span>${this.lang.get('SCORE')}</span> <span class="stat-value">${score}</span>`;
         }
         if (this.highScoreLabel) {
-            const isNewRecord = score > highScore;
+            const isNewRecord = score > highScore && score > 0;
             this.highScoreLabel.innerHTML = isNewRecord ?
-                `<span style="color: #00ff88">🎉 NEW HIGH SCORE</span>` :
-                `${this.lang.get('HIGH_SCORE')}: ${highScore}`;
+                `<span style="color: #00ff88; font-weight:bold; width: 100%; text-align: center; text-shadow: 0 0 10px #00ff88;">🎉 NEW HIGH SCORE! 🎉</span>` :
+                `<span>${this.lang.get('HIGH_SCORE').toUpperCase()}</span> <span class="stat-value">${highScore}</span>`;
         }
         if (this.gemsLabel) {
-            this.gemsLabel.textContent = `💎 ${this.lang.get('EARNED_GEMS')}: ${gems}`;
+            this.gemsLabel.innerHTML = `<span>💎 ${this.lang.get('EARNED_GEMS')}</span> <span class="stat-value stat-highlight">${gems}</span>`;
         }
         if (this.comboLabel) {
-            this.comboLabel.textContent = `${this.lang.get('BEST_COMBO')}: ${maxCombo}`;
+            this.comboLabel.innerHTML = `<span>${this.lang.get('BEST_COMBO')}</span> <span class="stat-value">${maxCombo}</span>`;
         }
     }
 

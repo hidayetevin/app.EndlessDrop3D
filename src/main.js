@@ -159,10 +159,12 @@ class Game {
     this.countdownText = document.createElement('div');
     this.countdownText.style.cssText = `
       color: white;
-      font-size: 150px;
+      font-size: clamp(60px, 15vw, 150px);
       font-weight: bold;
       text-shadow: 0 0 30px rgba(0,217,255,0.5);
       font-family: Arial, sans-serif;
+      text-align: center;
+      width: 100%;
     `;
     this.countdownOverlay.appendChild(this.countdownText);
     document.body.appendChild(this.countdownOverlay);
@@ -356,7 +358,7 @@ class Game {
         count--;
         setTimeout(updateCount, 1000);
       } else {
-        this.countdownText.textContent = 'GO!';
+        this.countdownText.textContent = this.lang.get('GO');
         this.audio.playPerfect();
         setTimeout(() => {
           this.countdownOverlay.style.display = 'none';
