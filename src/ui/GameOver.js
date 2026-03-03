@@ -46,12 +46,22 @@ export class GameOver {
         // Stats Container
         const statsContainer = document.createElement('div');
         statsContainer.style.cssText = `
-            background: rgba(255,255,255,0.1);
-            padding: var(--spacing-md, 30px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: clamp(18px, 4.5vw, 24px);
+            font-weight: 600;
+            line-height: 1.6;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            padding: var(--spacing-md, 20px);
             border-radius: 20px;
             margin-bottom: clamp(10px, 2vw, 15px);
             max-width: 90vw;
             width: 300px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         `;
 
         this.scoreLabel = document.createElement('div');
