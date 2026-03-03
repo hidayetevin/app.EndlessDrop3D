@@ -10,11 +10,12 @@ export class Menu {
         this.isVisible = false;
     }
 
-    show() {
+    show(totalGems = 0) {
         if (this.container) {
             this.container.style.display = 'flex';
             this.isVisible = true;
             this.updateHighScore();
+            this.updateGems(totalGems);
             return;
         }
 
@@ -34,6 +35,31 @@ export class Menu {
             z-index: 3000;
             font-family: 'Arial', sans-serif;
         `;
+
+        // Gem Counter (Top Right)
+        this.gemContainer = document.createElement('div');
+        this.gemContainer.style.cssText = `
+            position: absolute;
+            top: clamp(20px, 4vw, 40px);
+            right: clamp(20px, 4vw, 40px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            font-weight: bold;
+            font-size: clamp(16px, 4vw, 22px);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            z-index: 3001;
+        `;
+        this.gemContainer.innerHTML = '💎 <span id="menu-gem-count">0</span>';
+        this.container.appendChild(this.gemContainer);
 
         // Title
         const title = document.createElement('h1');
@@ -111,6 +137,14 @@ export class Menu {
 
         document.body.appendChild(this.container);
         this.isVisible = true;
+        this.updateGems(totalGems);
+    }
+
+    updateGems(gems) {
+        if (this.gemContainer) {
+            const countSpan = this.gemContainer.querySelector('#menu-gem-count');
+            if (countSpan) countSpan.textContent = gems;
+        }
     }
 
     updateHighScore() {

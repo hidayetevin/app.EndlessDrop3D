@@ -108,7 +108,7 @@ class Game {
     );
 
     this.createOverlays();
-    this.menu.show(); // Show menu on startup
+    this.menu.show(this.storage.getTotalGems()); // Show menu on startup
 
     // Apply initial audio settings
     if (this.storage.data.settings.musicVolume !== undefined) {
@@ -230,7 +230,7 @@ class Game {
     if (this.tapOverlay) this.tapOverlay.style.display = 'none';
     if (this.countdownOverlay) this.countdownOverlay.style.display = 'none';
 
-    this.menu.show();
+    this.menu.show(this.storage.getTotalGems());
     this.audio.stop(); // Stop game music
 
     // Reset game elements so they don't persist in background
@@ -285,7 +285,7 @@ class Game {
     if (this.menu.container) {
       this.menu.container.remove();
       this.menu.container = null;
-      this.menu.show();
+      this.menu.show(this.storage.getTotalGems());
     }
     if (this.hud.container) {
       this.hud.container.remove();
@@ -578,7 +578,7 @@ class Game {
       }
     }
     this.hud.hide();
-    this.menu.show();
+    this.menu.show(this.storage.getTotalGems());
   }
 }
 
