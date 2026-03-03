@@ -88,6 +88,13 @@ core/
 
 ## 14. Versiyon Geçmişi
 
+### v2.0.0 (2026-03-03)
+- **Oyun Başı Sayacı (Countdown):** "3, 2, 1, GO!" akışına Pause/Resume (Duraklat/Devam Et) desteği ve Ana Sayfaya Dönüşte güvenli iptal eklendi. "GO!" metni (TR: BAŞLA!) yerelleştirildi. Taşıma sorunu esnek metin boyutu (clamp) ile çözüldü.
+- **Oyun Sonu (Game Over) Ekranı:** Hiyerarşisiz karanlık metinler Glassmorphism & Flexbox destekli okunabilir ve premium stat kutularına dönüştürüldü.
+- **Elmas Mantığı & UI:** Oyun Sonu ekranında (toplamın yerine) "Kazanılan Elmas (Earned Gems)" gösterimi aktif edildi. Ana Menü (Menu.js) ekranının sağ üst köşesine oyunun her aşamasında (menüdeyken) güncel "Toplam Elmas Sayaç Göstergesi" eklendi.
+- **Bonus Görselleri:** Toplanan 3D nesneler yenilendi. Klasik küreden kopup oyun dünyasına uyan yeni şık formlarına büründüler (Kum Saati, Kuvvet Kalkanı, Mıknatıs ve Cam Elmas).
+- **Reklam Akışı Optimizasyonu:** "2X Elmas Kazan (Rewarded)" reklamını izleyen kullanıcılara, oyun bittiğinde Yeniden Başla / Menü seçildiğinde zorunlu reklam (Interstitial) çıkarılması özelliği devre dışı bırakıldı.
+
 ### v0.2 (2026-01-31)
 
 #### 🎨 İkon ve Branding
