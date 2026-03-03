@@ -28,39 +28,103 @@ export class BonusSystem {
     }
 
     createBonus(type, position) {
-        const geometry = new THREE.SphereGeometry(0.4, 16, 16);
-        const material = new THREE.MeshStandardMaterial({
-            color: this.bonusTypes[type].color,
-            emissive: this.bonusTypes[type].color,
-            emissiveIntensity: 0.5,
-            metalness: 0.8,
-            roughness: 0.2
-        });
+        const group = new THREE.Group();
+        group.position.copy(position);
+        group.userData.type = type;
+        group.userData.isBonus = true;
 
-        const bonus = new THREE.Mesh(geometry, material);
-        bonus.position.copy(position);
-        bonus.userData.type = type;
-        bonus.userData.isBonus = true;
+        const baseColor = this.bonusTypes[type].color;
 
-        this.scene.add(bonus);
-        this.collectibles.push(bonus);
+        if (type === 'SLOW_MOTION') {
+            // Hourglass shape for Slow Motion
+            const coneGeom = new THREE.ConeGeometry(0.25, 0.4, 8);
+            const mat = new THREE.MeshStandardMaterial({
+                color: baseColor, emissive: baseColor, emissiveIntensity: 0.6, metalness: 0.8, roughness: 0.2
+            });
+            const topCone = new THREE.Mesh(coneGeom, mat);
+            topCone.position.y = 0.2;
+            topCone.rotation.x = Math.PI;
 
-        return bonus;
+            const bottomCone = new THREE.Mesh(coneGeom, mat);
+            bottomCone.position.y = -0.2;
+
+            group.add(topCone, bottomCone);
+        }
+        else if (type === 'SHIELD') {
+            // Forcefield sphere with a solid core
+            const coreGeom = new THREE.DodecahedronGeometry(0.2, 0);
+            const coreMat = new THREE.MeshStandardMaterial({
+                color: baseColor, emissive: baseColor, emissiveIntensity: 0.8, metalness: 1, roughness: 0
+            });
+            const core = new THREE.Mesh(coreGeom, coreMat);
+
+            const fieldGeom = new THREE.SphereGeometry(0.4, 16, 16);
+            const fieldMat = new THREE.MeshPhysicalMaterial({
+                color: baseColor, transmission: 0.9, opacity: 1, transparent: true, roughness: 0.1, metalness: 0.1
+            });
+            const field = new THREE.Mesh(fieldGeom, fieldMat);
+
+            group.add(core, field);
+        }
+        else if (type === 'MAGNET') {
+            // U-shape Horseshoe magnet
+            const magnetGeom = new THREE.TorusGeometry(0.25, 0.1, 8, 16, Math.PI);
+            const magnetMat = new THREE.MeshStandardMaterial({
+                color: 0xff0044, emissive: 0xff0044, emissiveIntensity: 0.4, metalness: 0.5, roughness: 0.5
+            });
+            const magnet = new THREE.Mesh(magnetGeom, magnetMat);
+            magnet.rotation.z = Math.PI; // Face down
+
+            const tipGeom = new THREE.CylinderGeometry(0.1, 0.1, 0.1, 8);
+            const tipMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.9, roughness: 0.2 });
+
+            const tip1 = new THREE.Mesh(tipGeom, tipMat);
+            tip1.position.set(0.25, -0.05, 0);
+            const tip2 = new THREE.Mesh(tipGeom, tipMat);
+            tip2.position.set(-0.25, -0.05, 0);
+
+            magnet.add(tip1, tip2);
+            group.add(magnet);
+        }
+
+        // Add a floating halo ring to highlight as powerup
+        const haloGeom = new THREE.TorusGeometry(0.5, 0.02, 4, 16);
+        const haloMat = new THREE.MeshBasicMaterial({ color: baseColor });
+        const halo = new THREE.Mesh(haloGeom, haloMat);
+        halo.rotation.x = Math.PI / 2;
+        group.add(halo);
+
+        this.scene.add(group);
+        this.collectibles.push(group);
+
+        return group;
     }
 
     createGem(position) {
+        // Classic diamond gem shape
         const geometry = new THREE.OctahedronGeometry(0.3, 0);
-        const material = new THREE.MeshStandardMaterial({
-            color: 0xffff00,
-            emissive: 0xffff00,
+        geometry.scale(1, 1.4, 1); // Stretch vertically to look like a diamond
+
+        const material = new THREE.MeshPhysicalMaterial({
+            color: 0x00ffff, // Cyan diamond color
+            emissive: 0x00aaff,
             emissiveIntensity: 0.6,
-            metalness: 1,
-            roughness: 0
+            metalness: 0.9,
+            roughness: 0.1,
+            transmission: 0.5, // Glass effect
+            thickness: 0.5
         });
 
         const gem = new THREE.Mesh(geometry, material);
         gem.position.copy(position);
         gem.userData.isGem = true;
+
+        // Inner glowing core to make it pop inside transmission
+        const coreGeom = new THREE.OctahedronGeometry(0.15, 0);
+        coreGeom.scale(1, 1.4, 1);
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const core = new THREE.Mesh(coreGeom, coreMat);
+        gem.add(core);
 
         this.scene.add(gem);
         this.collectibles.push(gem);
